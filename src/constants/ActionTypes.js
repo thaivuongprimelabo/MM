@@ -1,1 +1,3 @@
 export const SUBMIT_LOGIN = 'SUBMIT_LOGIN';
+export const EVENT_CLICK_MONTH_ITEM = 'EVENT_CLICK_MONTH_ITEM';
+export const INIT_DATA = 'INIT_DATA';

@@ -5,3 +5,12 @@ export const submitLogin = () => {
 		type : types.SUBMIT_LOGIN
 	}
 }
+
+export const initData = (year, month, day) => {
+	return {
+		type : types.INIT_DATA,
+		year : year,
+		month : month,
+		day: day
+	}
+}

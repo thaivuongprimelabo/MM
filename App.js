@@ -15,7 +15,8 @@ import {
 import { createStackNavigator } from 'react-navigation';
 
 import Login from './src/pages/Login';
-import Home from './src/pages/Home';
+import Year from './src/pages/Year';
+import Month from './src/pages/Month';
 
 // Store
 import { createStore } from 'redux';
@@ -24,11 +25,12 @@ import { Provider } from 'react-redux';
 
 const RootStack = createStackNavigator(
   {
-    Login: Login,
-    Home: Home,
+    LoginScreen: Login,
+    YearScreen: Year,
+    MonthScreen: Month
   },
   {
-    initialRouteName: 'Login',
+    initialRouteName: 'LoginScreen',
   }
 );
 
