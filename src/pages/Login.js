@@ -18,7 +18,7 @@ export default class Login extends Component<Props> {
   };
 
   onSubmitLogin = () => {
-    this.props.navigation.navigate('YearScreen');
+    this.props.navigation.navigate('WelcomeScreen');
   }
 
 	render() {

@@ -17,6 +17,7 @@ import { createStackNavigator } from 'react-navigation';
 import Login from './src/pages/Login';
 import Year from './src/pages/Year';
 import Month from './src/pages/Month';
+import Welcome from './src/pages/Welcome';
 
 // Store
 import { createStore } from 'redux';
@@ -27,7 +28,8 @@ const RootStack = createStackNavigator(
   {
     LoginScreen: Login,
     YearScreen: Year,
-    MonthScreen: Month
+    MonthScreen: Month,
+    WelcomeScreen: Welcome
   },
   {
     initialRouteName: 'LoginScreen',

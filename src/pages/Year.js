@@ -49,27 +49,35 @@ class Year extends Component<Props> {
     //         { ym: year + '12', name: '12', budget: '0', 'used': '0', remain: '0'}
     //       ];
 
-    this.state = {
-      monthsInYear: []
-    }
+    // this.state = {
+    //   monthsInYear: []
+    // }
   }
 
   componentWillMount() {
-    var monthsInYear = this.props.initData();
-    console.log(monthsInYear);
+    //this.props.initData('2018');
+    //console.log('componentWillMount');
+    //console.log(this.props.initData('2018'));
   }
 
-  static navigationOptions = {
-      title: 'Năm 2018',
+  static navigationOptions = ({ navigation }) => {
+
+    var date = new Date();
+    var fullYear = date.getFullYear();
+
+    return {
+      title: 'Năm ' + fullYear,
       headerTintColor: Constants.HEADER_TINI_COLOR,
       headerLeft: null,
       headerStyle: {
         backgroundColor: Constants.HEADER_BG_COLOR 
       },
+    }
+      
   };
 
-  onMonthItemClick = (ym) => {
-    this.props.navigation.navigate('MonthScreen', { ym: ym });
+  onMonthItemClick = (month) => {
+    this.props.navigation.navigate('MonthScreen', { month: month });
   }
 
   onMoneyIconClick = () => {
@@ -77,20 +85,21 @@ class Year extends Component<Props> {
   }
 
   _renderItem = ({item}) => (
-      <TouchableOpacity style={ styles.infoMoneyItem } onPress={ () => this.onMonthItemClick(item.ym) }>
-        <ListItem type={0} name={ item.name } budget={ item.budget } used={ item.used } remain={ item.remain } onMoneyIconClick={ this.onMoneyIconClick }  />
+      <TouchableOpacity style={ styles.infoMoneyItem } onPress={ () => this.onMonthItemClick(item.id) }>
+        <ListItem type={0} name={ item.id } budget={ item.budget } used={ item.used } remain={ item.remain } onMoneyIconClick={ this.onMoneyIconClick }  />
       </TouchableOpacity>
   );
 
   render() {
-    var { monthsInYear }  = this.state;
+    
+    var { dataInYear }  = this.props;
 
     return (
       <View style={styles.container}>
         <FlatList
             contentContainerStyle={styles.list}
-            data={ monthsInYear }
-            extraData={this.state}
+            data={ dataInYear }
+            extraData={this.props}
             keyExtractor={(item, index) => index.toString()}
             renderItem={ this._renderItem } />
       </View>
@@ -117,15 +126,16 @@ const styles = StyleSheet.create({
 });
 
 const mapStateToProps = (state) => {
-    return {};
+    return {
+      dataInYear : state.dataInYear,
+      fullYear : state.fullYear
+    };
 };
-
-
 
 const mapDispatchToProps = (dispatch, props) => {
     return {
       initData: (year) => {
-        dispatch(Actions.initData(year));
+        dispatch(Actions.initData(year, null, null));
       }
     };
 }

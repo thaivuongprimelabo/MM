@@ -27,8 +27,8 @@ class Month extends Component<Props> {
   constructor(props) {
     super(props);
 
-    var date = new Date();
-    var year = date.getFullYear();
+    // var date = new Date();
+    // var year = date.getFullYear();
     // var months = [
     //         { ym: year + '01', name: '1', code: '#1abc9c', budget: '0', 'used': '0', remain: '0'},  
     //         { ym: year + '02', name: '2', code: '#2ecc71', budget: '0', 'used': '0', remain: '0'},
@@ -44,18 +44,25 @@ class Month extends Component<Props> {
     //         { ym: year + '12', name: '12', code: '#e67e22', budget: '0', 'used': '0', remain: '0'}
     //       ];
 
-    this.state = {
-      year: year,
-      days: []
-    }
+    // this.state = {
+    //   year: year,
+    //   days: []
+    // }
   }
 
-  static navigationOptions = {
-      title: 'Tháng 1 - 2018',
+  static navigationOptions = ({ navigation }) => {
+
+    const { params } = navigation.state;
+
+    var { year } = this.props;
+
+    return {
+      title: params.day + year,
       headerTintColor: Constants.HEADER_TINI_COLOR,
       headerStyle: {
         backgroundColor: Constants.HEADER_BG_COLOR 
       },
+    }
   };
 
   onDayItemClick = () => {
@@ -69,18 +76,14 @@ class Month extends Component<Props> {
   );
 
   render() {
-    var { year } = this.state;
-
-    var { navigation } = this.props;
-
-    var ym = navigation.getParam('ym');
+    var { dataInMonth } = this.props;
 
     return (
       <View style={styles.container}>
         <FlatList
             contentContainerStyle={styles.list}
-            data={this.state.days}
-            extraData={this.state}
+            data={dataInMonth}
+            extraData={this.props}
             keyExtractor={(item, index) => index.toString()}
             renderItem={ this._renderItem } />
       </View>
@@ -109,6 +112,8 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = (state) => {
     return {
+      dataInMonth : state.dataInMonth,
+      year : year
     }
 };
 
