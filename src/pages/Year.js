@@ -11,12 +11,17 @@ import {
   Text,
   View,
   FlatList,
-  TouchableOpacity
+  TouchableOpacity,
+  ActivityIndicator,
+  AsyncStorage
 } from 'react-native';
 
 import { connect } from 'react-redux';
 
+import Storage from 'react-native-storage';
+
 import ListItem from '../components/ListItem';
+import Loading from '../components/Loading';
 
 import * as Constants from '../constants/Constants';
 import * as Actions from '../actions/index';
@@ -25,39 +30,34 @@ import Utils from '../constants/Utils';
 
 type Props = {};
 
-
-
 class Year extends Component<Props> {
 
   constructor(props) {
     super(props);
 
-    // var date = new Date();
-    // var year = date.getFullYear();
-    // var months = [
-    //         { ym: year + '01', name: '1', budget: '0', 'used': '0', remain: '0'},  
-    //         { ym: year + '02', name: '2', budget: '0', 'used': '0', remain: '0'},
-    //         { ym: year + '03', name: '3',  budget: '0', 'used': '0', remain: '0'},  
-    //         { ym: year + '04', name: '4', budget: '0', 'used': '0', remain: '0'},
-    //         { ym: year + '05', name: '5', budget: '0', 'used': '0', remain: '0'},  
-    //         { ym: year + '06', name: '6', budget: '0', 'used': '0', remain: '0'},
-    //         { ym: year + '07', name: '7', budget: '0', 'used': '0', remain: '0'},  
-    //         { ym: year + '08', name: '8', budget: '0', 'used': '0', remain: '0'},
-    //         { ym: year + '09', name: '9', budget: '0', 'used': '0', remain: '0'},  
-    //         { ym: year + '10', name: '10', budget: '0', 'used': '0', remain: '0'},
-    //         { ym: year + '11', name: '11', budget: '0', 'used': '0', remain: '0'}, 
-    //         { ym: year + '12', name: '12', budget: '0', 'used': '0', remain: '0'}
-    //       ];
-
-    // this.state = {
-    //   monthsInYear: []
-    // }
+    this.state = {
+      dataInYear : [],
+      
+    }
   }
 
   componentWillMount() {
-    //this.props.initData('2018');
-    //console.log('componentWillMount');
-    //console.log(this.props.initData('2018'));
+    
+  }
+
+  componentDidMount() {
+    this.props.loadDataInYear('2018');
+  }
+
+  componentWillReceiveProps(nextProps) {
+    var { dataInYear } = nextProps;
+    if(dataInYear.length) {
+      this.interval = setTimeout(() => {
+        this.setState({
+          dataInYear : dataInYear
+        })
+      }, 1000);
+    }
   }
 
   static navigationOptions = ({ navigation }) => {
@@ -66,7 +66,7 @@ class Year extends Component<Props> {
     var fullYear = date.getFullYear();
 
     return {
-      title: 'Năm ' + fullYear,
+      title: Constants.YEAR + ' ' + fullYear,
       headerTintColor: Constants.HEADER_TINI_COLOR,
       headerLeft: null,
       headerStyle: {
@@ -77,7 +77,8 @@ class Year extends Component<Props> {
   };
 
   onMonthItemClick = (month) => {
-    this.props.navigation.navigate('MonthScreen', { month: month });
+    var currentYear = Utils.getCurrentYear();
+    this.props.navigation.navigate('MonthScreen', { month: month, year: currentYear });
   }
 
   onMoneyIconClick = () => {
@@ -92,16 +93,23 @@ class Year extends Component<Props> {
 
   render() {
     
-    var { dataInYear }  = this.props;
+    var { dataInYear } = this.state;
+
+    var render = <Loading />;
+
+    if(dataInYear.length) {
+
+      render = <FlatList
+                contentContainerStyle={styles.list}
+                data={ dataInYear }
+                extraData={this.state}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={ this._renderItem } />;
+    }
 
     return (
       <View style={styles.container}>
-        <FlatList
-            contentContainerStyle={styles.list}
-            data={ dataInYear }
-            extraData={this.props}
-            keyExtractor={(item, index) => index.toString()}
-            renderItem={ this._renderItem } />
+        { render }
       </View>
     );
   }
@@ -127,17 +135,16 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = (state) => {
     return {
-      dataInYear : state.dataInYear,
-      fullYear : state.fullYear
+      dataInYear : state.dataInYear
     };
 };
 
 const mapDispatchToProps = (dispatch, props) => {
-    return {
-      initData: (year) => {
-        dispatch(Actions.initData(year, null, null));
-      }
-    };
+  return {
+    loadDataInYear : (year) => {
+      dispatch(Actions.loadDataInYear(year))
+    }
+  };
 }
 
 

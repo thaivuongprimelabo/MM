@@ -46,7 +46,7 @@ export default class ListItem extends Component<Props> {
     } else {
 
       infoDateTime = <View style={ styles.itemGroupLeft }>
-                      <Text style={ styles.itemMonth }>{Constants.MONTH}</Text>
+                      <Text style={ styles.itemMonth }>{this.props.dayOfWeek}</Text>
                       <Text style={ styles.itemMonthNumber }>{this.props.name}</Text>
                      </View>;
 

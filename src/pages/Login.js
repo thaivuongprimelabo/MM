@@ -4,8 +4,11 @@ import {
   Platform,
   StyleSheet,
   Text,
-  View
+  View,
+  AsyncStorage
 } from 'react-native';
+
+import Storage from 'react-native-storage';
 
 import Logo from '../components/Logo';
 import Form from '../components/Form';
@@ -17,15 +20,11 @@ export default class Login extends Component<Props> {
     	header: null
   };
 
-  onSubmitLogin = () => {
-    this.props.navigation.navigate('WelcomeScreen');
-  }
-
 	render() {
 		return (
 				<View style={ styles.container }>
 					<Logo />
-					<Form onSubmitLogin={ this.onSubmitLogin } />
+					<Form onSubmitLogin={ this.onSubmitLogin } navigation={this.props.navigation} />
 				</View>
 		)
 	}
