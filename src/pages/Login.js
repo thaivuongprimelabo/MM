@@ -8,8 +8,6 @@ import {
   AsyncStorage
 } from 'react-native';
 
-import Storage from 'react-native-storage';
-
 import Logo from '../components/Logo';
 import Form from '../components/Form';
 

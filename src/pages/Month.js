@@ -11,13 +11,15 @@ import {
   Text,
   View,
   FlatList,
-  TouchableOpacity
+  TouchableOpacity,
+  Image
 } from 'react-native';
 
 import { connect } from 'react-redux';
 
 import ListItem from '../components/ListItem';
 import Loading from '../components/Loading';
+import MenuBottom from '../components/MenuBottom';
 
 
 import * as Constants from '../constants/Constants';
@@ -50,19 +52,25 @@ class Month extends Component<Props> {
         backgroundColor: Constants.HEADER_BG_COLOR 
       },
       headerRight: (
-        <View></View>
+        <TouchableOpacity onPress={ navigation.getParam('openMenuBottom') }  style={{ marginRight:10 }}>
+            <Image source={require('../img/icon-menu.png')}  />
+        </TouchableOpacity >
       )
     }
   };
 
   componentDidMount() {
-    console.log('componentDidMount');
+    this.props.navigation.setParams({ openMenuBottom: this._openMenuBottom });
     var { navigation  } = this.props;
+    var year = navigation.getParam('year');
+    var month = navigation.getParam('month');
+    var budget = navigation.getParam('budget');
     this.setState({
-      year : navigation.getParam('year'),
-      month : navigation.getParam('month')
-    })
-    this.props.loadDataInMonth(this.state.year, this.state.month);
+      year : year,
+      month : month
+    });
+    
+    this.props.loadDataInMonth(year, month, budget);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -72,8 +80,12 @@ class Month extends Component<Props> {
         this.setState({
           dataInMonth : dataInMonth
         })
-      }, 1000);
+      }, Constants.DEFAULT_TIMEOUT);
     }
+  }
+
+  _openMenuBottom = () => {
+    this.refs.showMenuBotton.showActionSheet();
   }
 
   onDayItemClick = (day) => {
@@ -88,9 +100,10 @@ class Month extends Component<Props> {
   );
 
   render() {
-    var { dataInMonth } = this.state;
-
+    var { dataInMonth, year, month } = this.state;
+    
     var render = <Loading />;
+    var menuBottom = <MenuBottom ref={'showMenuBotton'} navigation={this.props.navigation} />
 
     if(dataInMonth.length) {
 
@@ -105,6 +118,7 @@ class Month extends Component<Props> {
     return (
       <View style={styles.container}>
         { render }
+        { menuBottom }
       </View>
     );
   }
@@ -139,8 +153,8 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch, props) => {
     return {
-      loadDataInMonth: (year, month) => {
-        dispatch(Actions.loadDataInMonth(year, month));
+      loadDataInMonth: (year, month, budget) => {
+        dispatch(Actions.loadDataInMonth(year, month, budget));
       }
     };
 }

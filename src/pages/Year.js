@@ -13,15 +13,16 @@ import {
   FlatList,
   TouchableOpacity,
   ActivityIndicator,
-  AsyncStorage
+  AsyncStorage,
+  Image
 } from 'react-native';
 
 import { connect } from 'react-redux';
-
-import Storage from 'react-native-storage';
+import ActionSheet from 'react-native-actionsheet';
 
 import ListItem from '../components/ListItem';
 import Loading from '../components/Loading';
+import MenuBottom from '../components/MenuBottom';
 
 import * as Constants from '../constants/Constants';
 import * as Actions from '../actions/index';
@@ -36,8 +37,7 @@ class Year extends Component<Props> {
     super(props);
 
     this.state = {
-      dataInYear : [],
-      
+      dataInYear : []
     }
   }
 
@@ -46,6 +46,7 @@ class Year extends Component<Props> {
   }
 
   componentDidMount() {
+    this.props.navigation.setParams({ openMenuBottom: this._openMenuBottom });
     this.props.loadDataInYear('2018');
   }
 
@@ -56,7 +57,7 @@ class Year extends Component<Props> {
         this.setState({
           dataInYear : dataInYear
         })
-      }, 1000);
+      }, Constants.DEFAULT_TIMEOUT);
     }
   }
 
@@ -72,13 +73,22 @@ class Year extends Component<Props> {
       headerStyle: {
         backgroundColor: Constants.HEADER_BG_COLOR 
       },
+      headerRight: (
+        <TouchableOpacity onPress={ navigation.getParam('openMenuBottom') }  style={{ marginRight:10 }}>
+            <Image source={require('../img/icon-menu.png')}  />
+        </TouchableOpacity >
+      )
     }
       
   };
 
-  onMonthItemClick = (month) => {
+  onMonthItemClick = (month, budget) => {
     var currentYear = Utils.getCurrentYear();
-    this.props.navigation.navigate('MonthScreen', { month: month, year: currentYear });
+    this.props.navigation.navigate('MonthScreen', { month: month, year: currentYear, budget: budget});
+  }
+
+  _openMenuBottom = () => {
+    this.refs.showMenuBotton.showActionSheet();
   }
 
   onMoneyIconClick = () => {
@@ -86,7 +96,7 @@ class Year extends Component<Props> {
   }
 
   _renderItem = ({item}) => (
-      <TouchableOpacity style={ styles.infoMoneyItem } onPress={ () => this.onMonthItemClick(item.id) }>
+      <TouchableOpacity style={ styles.infoMoneyItem } onPress={ () => this.onMonthItemClick(item.id, item.budget) }>
         <ListItem type={0} name={ item.id } budget={ item.budget } used={ item.used } remain={ item.remain } onMoneyIconClick={ this.onMoneyIconClick }  />
       </TouchableOpacity>
   );
@@ -96,6 +106,7 @@ class Year extends Component<Props> {
     var { dataInYear } = this.state;
 
     var render = <Loading />;
+    var menuBottom = <MenuBottom ref={'showMenuBotton'} navigation={this.props.navigation}  />
 
     if(dataInYear.length) {
 
@@ -110,6 +121,7 @@ class Year extends Component<Props> {
     return (
       <View style={styles.container}>
         { render }
+        { menuBottom }
       </View>
     );
   }

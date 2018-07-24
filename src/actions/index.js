@@ -13,11 +13,12 @@ export const loadDataInYear = (year) => {
 	}
 }
 
-export const loadDataInMonth = (year, month) => {
+export const loadDataInMonth = (year, month, budget) => {
 	return {
 		type : types.LOAD_DATA_IN_MONTH,
 		year : year,
-		month : month
+		month : month,
+		budget: budget
 	}
 }
 

@@ -7,11 +7,8 @@ import {
   View,
   InteractionManager,
   ActivityIndicator,
-  Image,
-  AsyncStorage
+  Image
 } from 'react-native';
-
-import Storage from 'react-native-storage';
 
 import { connect } from 'react-redux';
 
@@ -20,33 +17,22 @@ import * as Actions from '../actions/index';
 
 import Utils from '../constants/Utils';
 
-var storage = new Storage({
-  // maximum capacity, default 1000 
-  size: 1000,
-
-  // Use AsyncStorage for RN, or window.localStorage for web.
-  // If not set, data would be lost after reload.
-  storageBackend: AsyncStorage,
-  
-  // expire time, default 1 day(1000 * 3600 * 24 milliseconds).
-  // can be null, which means never expire.
-  defaultExpires: 1000 * 3600 * 24,
-  
-  // cache data in the memory. default is true.
-  enableCache: false,
-  
-  // if data was not found in storage or expired,
-  // the corresponding sync method will be invoked and return 
-  // the latest data.
-  sync : {
-    // we'll talk about the details later.
-  }
-});
+var SQLite = require('react-native-sqlite-storage')
+var db = SQLite.openDatabase({name: 'test.db', createFromLocation: '~sqliteexample.db'}, this.errorCB, this.successCB);
 
 class Welcome extends Component<Props> {
 
   constructor(props) {
     super(props);
+
+  }
+
+  errorCB(err) {
+    console.log(err);
+  }
+
+  successCB(err) {
+    console.log(err);
   }
 
 	static navigationOptions = {
@@ -55,18 +41,25 @@ class Welcome extends Component<Props> {
 
   componentDidMount() {
     this.interval = setTimeout(() => {
-      this._checkData();
-    }, 2000);
+      this._checkLogin();
+    }, 1000);
   }
 
-  _checkData = () => {
-    Utils.getDataFromStorage('isLogin').then((islogin) => {
-      if(islogin === '1') {
-        this.props.navigation.navigate('YearScreen');
-      } else {
-        this.props.navigation.navigate('LoginScreen');
-      }
-    });
+  _checkLogin() {
+    try {
+      db.transaction((tx) =>   {
+        tx.executeSql('SELECT * FROM ' + Constants.USERS_TBL, [], (tx, results) => { 
+          var len = results.rows.length;
+          if(len === 0) {
+            this.props.navigation.navigate('LoginScreen');
+          } else {
+            this.props.navigation.navigate('YearScreen');
+          }
+        });
+      });
+    } catch (error) {
+      console.log("Error retrieving data" + error);
+    }
   }
 
 	render() {

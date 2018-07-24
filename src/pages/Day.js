@@ -23,7 +23,7 @@ import ActionItem from '../components/ActionItem';
 import Loading from '../components/Loading';
 import NoDataFound from '../components/NoDataFound';
 import AddModal from '../components/AddModal';
-import ButtonHeaderRight from '../components/ButtonHeaderRight';
+import MenuBottom from '../components/MenuBottom';
 
 import * as Constants from '../constants/Constants';
 import * as Actions from '../actions/index';
@@ -56,22 +56,26 @@ class Day extends Component<Props> {
         backgroundColor: Constants.HEADER_BG_COLOR 
       },
       headerRight: (
-        <TouchableOpacity  onPress={ navigation.getParam('openAddModal') } style={{ marginRight:10 }}>
-            <Image source={require('../img/icon-add.png')}  />
+        <TouchableOpacity onPress={ navigation.getParam('openMenuBottom') }  style={{ marginRight:10 }}>
+            <Image source={require('../img/icon-menu.png')}  />
         </TouchableOpacity >
       )
     }
   };
 
   componentDidMount() {
-    this.props.navigation.setParams({ openAddModal: this._openAddModal });
+    this.props.navigation.setParams({ openMenuBottom: this._openMenuBottom });
     var { navigation  } = this.props;
+
+    var year = navigation.getParam('year');
+    var month = navigation.getParam('month');
+    var day = navigation.getParam('day');
     this.setState({
-      year : navigation.getParam('year'),
-      month : navigation.getParam('month'),
-      day: navigation.getParam('day')
+      year : year,
+      month : month,
+      day: day
     })
-    this.props.loadDataInDay(this.state.year, this.state.month, this.state.day);
+    this.props.loadDataInDay(year, month, day);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -82,7 +86,7 @@ class Day extends Component<Props> {
           this.setState({
             dataInDay : dataInDay
           });
-        }, 1000);
+        }, Constants.DEFAULT_TIMEOUT);
       } else {
         console.log('componentWillReceiveProps');
         this.setState({
@@ -91,6 +95,10 @@ class Day extends Component<Props> {
       }
       
     }
+  }
+
+  _openMenuBottom = () => {
+    this.refs.showMenuBotton.showActionSheet();
   }
 
   _openAddModal = () => {
@@ -118,6 +126,7 @@ class Day extends Component<Props> {
 
     var render = <Loading />;
     var modal = <AddModal ref={'addModal'} parentFlatList={this} addAction={ this.addAction } />
+    var menuBottom = <MenuBottom ref={'showMenuBotton'} screen={'DayScreen'} navigation={this.props.navigation} />
 
     if(dataInDay.length) {
       render = <FlatList
@@ -137,6 +146,7 @@ class Day extends Component<Props> {
         <View style={styles.container}>
           { render }
           { modal }
+          { menuBottom }
         </View>
     );
   }

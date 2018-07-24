@@ -35,3 +35,11 @@ export const DEFAULT_SYNC_URI= DEFAULT_SERVER + '/api/v1/sync';
 export const DEFAULT_BACKUP_URI= DEFAULT_SERVER + '/api/v1/backup';
 export const DEFAULT_AUTH_URI= DEFAULT_SERVER + '/api/v1/auth';
 export const DEFAULT_SETTING_URI= DEFAULT_SERVER + '/api/v1/settings';
+export const DEFAULT_BUDGET = '2500000';
+export const DEFAULT_TIMEOUT = 1000;
+
+export const TYPES_TBL= 'types';
+export const ACTIONS_TBL= 'actions';
+export const SETTINGS_TBL= 'settings';
+export const LOCATIONS_TBL= 'locations';
+export const USERS_TBL= 'users';

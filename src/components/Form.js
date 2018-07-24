@@ -8,40 +8,17 @@ import {
   TextInput,
   TouchableOpacity,
   Alert,
-  AsyncStorage,
   ActivityIndicator
 } from 'react-native';
 
 import { connect } from 'react-redux';
 
-import Storage from 'react-native-storage';
-
 import * as Actions from '../actions/index';
 import * as Constants from '../constants/Constants';
 import Utils from '../constants/Utils';
 
-var storage = new Storage({
-  // maximum capacity, default 1000 
-  size: 1000,
-
-  // Use AsyncStorage for RN, or window.localStorage for web.
-  // If not set, data would be lost after reload.
-  storageBackend: AsyncStorage,
-  
-  // expire time, default 1 day(1000 * 3600 * 24 milliseconds).
-  // can be null, which means never expire.
-  defaultExpires: 1000 * 3600 * 24,
-  
-  // cache data in the memory. default is true.
-  enableCache: false,
-  
-  // if data was not found in storage or expired,
-  // the corresponding sync method will be invoked and return 
-  // the latest data.
-  sync : {
-    // we'll talk about the details later.
-  }
-})
+var SQLite = require('react-native-sqlite-storage')
+var db = SQLite.openDatabase({name: 'test.db', createFromLocation: '~sqliteexample.db'}, this.errorCB, this.successCB);
 
 class Form extends Component<Props> {
 
@@ -84,17 +61,83 @@ class Form extends Component<Props> {
     
   }
 
-  _storeData = (response) => {
-    storage.save({
-      key: 'loginState',   // Note: Do not use underscore("_") in key!
-      data: { 
-        response : response,
-        isLogin: '1'
-      },
-      
-      // if not specified, the defaultExpires will be applied instead.
-      // if set to null, then it will never expire.
-      expires: 1000 * 3600
+  _saveToSqlite = (responseJson) => {
+    var json = JSON.parse(responseJson);
+    var typeInsertSQL = locationInsertSQL = actionInsertSQL = '';
+
+    // Types
+    var types = json.types;
+    var lenTypes = types.length;
+    if(lenTypes > 0) {
+      typeInsertSQL = 'INSERT INTO ' + Constants.TYPES_TBL + ' VALUES ';
+      var value = '';
+      for(var i = 0; i < lenTypes; i++) {
+        var obj = types[i];
+        value += '(' + obj.value + ', "' + obj.name + '", "' + obj.color + '", "' + obj.icon + '", ' + obj.is_sync + ', ' + obj.order + ', "' + obj.created_at + '", "' + obj.updated_at + '"),';
+      }
+      typeInsertSQL = typeInsertSQL + value.substring(0, value.length - 1);
+    }
+
+    // Locations
+    var locations = json.locations;
+    var lenLocations = locations.length;
+    if(lenLocations > 0) {
+      locationInsertSQL = 'INSERT INTO ' + Constants.LOCATIONS_TBL + ' VALUES ';
+      var value = '';
+      for(var i = 0; i < lenLocations; i++) {
+        var obj = locations[i];
+        value += '(' + obj.id + ', "' + obj.name + '", "' + obj.latlong + '", ' + obj.is_sync + ', "' + obj.address + '", "' + obj.desc_image + '", "' + obj.created_at + '", "' + obj.updated_at + '"),';
+      }
+      locationInsertSQL = locationInsertSQL + value.substring(0, value.length - 1);
+    }
+
+    // Actions
+    var actions = json.actions;
+    var lenActions = actions.length;
+    if(lenActions > 0) {
+      actionInsertSQL = 'INSERT INTO ' + Constants.ACTIONS_TBL + ' VALUES ';
+      var value = '';
+      for(var i = 0; i < lenActions; i++) {
+        var obj = actions[i];
+        value += '(' + obj.id + ', "' + obj.name + '", "' + obj.cost + '", "' + obj.time + '", ' + obj.location_id + ', "' + obj.comment + '", ' + obj.type_id + ', ' + obj.is_sync + ', "' + obj.created_at + '", "' + obj.updated_at + '"),';
+      }
+      actionInsertSQL = actionInsertSQL + value.substring(0, value.length - 1);
+    }
+
+    // Users
+    var users = json.user_info;
+    var userInsertSQL = 'INSERT INTO ' + Constants.USERS_TBL + ' VALUES(' + users.id + ', "' + users.loginid + '", "123456") ';
+
+    // Insert sqlite
+    db.transaction((tx) =>   {
+      if(typeInsertSQL !== '') {
+        tx.executeSql('DELETE FROM ' + Constants.TYPES_TBL, [], (tx, results) => { console.log(results); });
+        tx.executeSql(typeInsertSQL, [], (tx, results) => { console.log(results); });
+      }
+
+      if(locationInsertSQL !== '') {
+        tx.executeSql('DELETE FROM ' + Constants.LOCATIONS_TBL, [], (tx, results) => { console.log(results); });
+        tx.executeSql(locationInsertSQL, [], (tx, results) => { console.log(results); });
+      }
+
+      if(actionInsertSQL !== '') {
+        tx.executeSql('DELETE FROM ' + Constants.ACTIONS_TBL, [], (tx, results) => { console.log(results); });
+        tx.executeSql(actionInsertSQL, [], (tx, results) => { console.log(results); });
+      }
+
+      if(userInsertSQL !== '') {
+        tx.executeSql('DELETE FROM ' + Constants.USERS_TBL, [], (tx, results) => { console.log(results); });
+        tx.executeSql(userInsertSQL, [], (tx, results) => { console.log(results); });
+      }
+
+      tx.executeSql('SELECT * FROM ' + Constants.USERS_TBL, [], (tx, results) => { 
+        var len = results.rows.length;
+        if(len === 0) {
+          this.props.navigation.navigate('LoginScreen');
+        } else {
+          this.props.navigation.navigate('YearScreen');
+        }
+      });
     });
   }
 
@@ -112,10 +155,9 @@ class Form extends Component<Props> {
     })
     .then((response) => response.json())
     .then((responseJson) => {
+
         if(responseJson.code === 200) {
-          //await AsyncStorage.setItem('data', responseJson.data);
-          //await AsyncStorage.setItem('isLogin', true);
-          this._storeData(responseJson.data);
+          this._saveToSqlite(responseJson.data);
           checkLogin = true;
         }
     })
@@ -124,7 +166,7 @@ class Form extends Component<Props> {
     });
 
     if(checkLogin) {
-      this.props.navigation.navigate('YearScreen');
+      //this.props.navigation.navigate('YearScreen');
     } else {
       Alert.alert(Constants.ALERT_TITLE_ERR, Constants.LOGIN_FAILED);
     }
