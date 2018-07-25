@@ -21,10 +21,7 @@ var myReducer = (state = initialState, action) => {
 		        tempData.push(day);
 		    }
 
-			var strYr = JSON.stringify(action.year);
-			var strMth = JSON.stringify(action.month);
-			var strYm = strYr + (strMth.length === 1 ? '0' + strMth : strMth);
-
+			var strYm = Utils.formatDateString({ year: action.year, month: action.month, day: 0, format: 'YYYYMM' });
 			var sql = 'SELECT act.name, substr(act.time, 7,2) as d, SUM(act.cost) as total_cost, count(act.id) as count FROM actions act ';
 		        	sql += 'WHERE substr(time, 1, 6) = "' + strYm + '" ';
 		        	sql += 'GROUP BY act.time ';

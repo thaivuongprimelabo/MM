@@ -33,10 +33,10 @@ class AddModal extends Component<Props> {
     super(props);
 
     this.state = {
-      name: '',
-      price: '',
-      type: '0',
-      location: '',
+      name: 'AAAA',
+      price: '11111',
+      type: 4,
+      location: 7,
       ymd: ''
     };
   }
@@ -57,7 +57,10 @@ class AddModal extends Component<Props> {
     }
 
     if(error === '') {
-      this.props.addAction(this.state);
+      var formdata = this.state;
+      formdata['ymd'] = this.props.ymd;
+      formdata['types_locations'] = this.props.types_locations;
+      this.props.onAddAction(formdata);
       this.refs.myModal.close();
     } else {
       Alert.alert(Constants.ALERT_TITLE_INFO, error);
@@ -131,9 +134,9 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch, props) => {
   return {
     onAddAction: (formdata) => {
-      dispatch(Actions.onAddAction(formdata));
+      dispatch(Actions.addAction(formdata));
     }
   }
 }
 
-export default connect(mapStateToProps,null, null, { withRef: true})(AddModal);
+export default connect(mapStateToProps,mapDispatchToProps, null, { withRef: true})(AddModal);

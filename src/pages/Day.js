@@ -40,7 +40,8 @@ class Day extends Component<Props> {
       dataInDay: [],
       year: 0,
       month: 0,
-      count : 0
+      count : 0,
+      ymd: '',
     }
   }
 
@@ -71,11 +72,13 @@ class Day extends Component<Props> {
     var month = navigation.getParam('month');
     var day = navigation.getParam('day');
     var count = navigation.getParam('count');
+    var ymd = Utils.formatDateString({ year: year, month: month, day: day, format: 'YYYYMMDD' });
     this.setState({
       year : year,
       month : month,
       day: day,
       count: count,
+      ymd: ymd
     })
     this.props.loadDataInDay(year, month, day, count);
   }
@@ -83,19 +86,11 @@ class Day extends Component<Props> {
   componentWillReceiveProps(nextProps) {
     var { dataInDay } = nextProps;
     if(dataInDay.length) {
-      if(dataInDay[0].id != 99) {
         this.interval = setTimeout(() => {
           this.setState({
             dataInDay : dataInDay
           });
         }, Constants.DEFAULT_TIMEOUT);
-      } else {
-        console.log('componentWillReceiveProps');
-        this.setState({
-          nodatafound : true
-        });
-      }
-      
     }
   }
 
@@ -120,16 +115,16 @@ class Day extends Component<Props> {
       <ActionItem index={index} icon={ item.icon } action_id={ item.id } action_name={ item.name } time={ item.time } location={ item.location } price={ item.price } openEditModal={ this.openEditModal } />
   );
 
-  addAction = (action) => {
-    console.log(action);
-  }
-
   render() {
-    var { dataInDay, count, year, month, day } = this.state;
+    var { dataInDay, year, month, day, ymd, count } = this.state;
 
     var render = <Loading />;
-    var modal = <AddModal ref={'addModal'} parentFlatList={this} addAction={ this.addAction } ymd={ ymd } />
+    var modal = <AddModal ref={'addModal'} parentFlatList={this} ymd={ ymd } />
     var menuBottom = <MenuBottom ref={'showMenuBotton'} screen={'DayScreen'} navigation={this.props.navigation} openAddModal={ this._openAddModal } />
+
+    if(!count) {
+      render = <NoDataFound />;
+    }
 
     if(dataInDay.length) {
       render = <FlatList
@@ -140,16 +135,13 @@ class Day extends Component<Props> {
             renderItem={ this._renderItem } />;
     }
 
-    if(!count) {
-      render = <NoDataFound />
-    }
-
     return (
       
         <View style={styles.container}>
           { render }
           { modal }
           { menuBottom }
+          
         </View>
     );
   }

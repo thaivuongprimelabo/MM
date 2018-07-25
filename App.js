@@ -19,6 +19,7 @@ import Year from './src/pages/Year';
 import Month from './src/pages/Month';
 import Welcome from './src/pages/Welcome';
 import Day from './src/pages/Day';
+import Test from './src/pages/Test';
 
 // Store
 import { createStore } from 'redux';
@@ -31,7 +32,8 @@ const RootStack = createStackNavigator(
     YearScreen: Year,
     MonthScreen: Month,
     WelcomeScreen: Welcome,
-    DayScreen : Day
+    DayScreen : Day,
+    TestScreen: Test
   },
   {
     initialRouteName: 'WelcomeScreen',

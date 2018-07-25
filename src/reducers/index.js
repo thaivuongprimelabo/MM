@@ -6,6 +6,7 @@ import month from './month';
 import day from './day';
 import types_locations from './types_locations';
 import locations from './locations';
+import actions from './actions';
 
 const myReducer = combineReducers({
 	login : login,
@@ -13,6 +14,7 @@ const myReducer = combineReducers({
 	dataInMonth : month,
 	dataInDay : day,
 	types_locations: types_locations,
+	actions: actions
 });
 
 export default myReducer;

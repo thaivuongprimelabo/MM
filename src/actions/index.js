@@ -52,6 +52,13 @@ export const editAction = (formdata) => {
 	}
 }
 
+export const delAction = (id) => {
+	return {
+		type : types.DEL_ACTION,
+		id : id
+	}
+}
+
 export const loginAction = (loginInfo) => {
 	return {
 		type: types.LOGIN_ACTION,

@@ -6,4 +6,5 @@ export const LOAD_DATA_IN_DAY = 'LOAD_DATA_IN_DAY';
 export const GET_DATA_FROM_SQLITE = 'GET_DATA_FROM_SQLITE';
 export const ADD_ACTION = 'ADD_ACTION';
 export const EDIT_ACTION = 'EDIT_ACTION';
+export const DEL_ACTION = 'DEL_ACTION';
 export const LOGIN_ACTION = 'LOGIN_ACTION';

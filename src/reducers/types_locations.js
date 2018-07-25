@@ -9,9 +9,9 @@ var initialState = {
 }
 
 var sql = 'SELECT * FROM ( ';
-	sql +='	SELECT value as id, name, 0 AS flag, `order` FROM types ';
+	sql +='	SELECT value as id, name, 0 AS flag, `order`, icon FROM types ';
 	sql +='	UNION ALL ';
-	sql +='	SELECT id, name, 1 AS flag, 1000 as `order` FROM locations ';
+	sql +='	SELECT id, name, 1 AS flag, 1000 as `order`, "" as icon FROM locations ';
 	sql +=')  ORDER BY `order` ';
 
 db.transaction((tx) => {

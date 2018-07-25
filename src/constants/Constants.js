@@ -38,6 +38,10 @@ export const DEFAULT_AUTH_URI= DEFAULT_SERVER + '/api/v1/auth';
 export const DEFAULT_SETTING_URI= DEFAULT_SERVER + '/api/v1/settings';
 export const DEFAULT_BUDGET = '2500000';
 export const DEFAULT_TIMEOUT = 1000;
+export const DEFAULT_ICON = 'https://facebook.github.io/react-native/docs/assets/favicon.png';
+
+export const IS_SYNC = 1;
+export const NOT_SYNC = 0;
 
 export const TYPES_TBL= 'types';
 export const ACTIONS_TBL= 'actions';

@@ -9,13 +9,16 @@ import {
   TouchableOpacity
 } from 'react-native';
 
+import { connect } from 'react-redux';
+
 import * as Constants from '../constants/Constants';
+import * as Actions from '../actions/index';
 import Utils from '../constants/Utils';
 import Swipeout from 'react-native-swipeout';
 import TrashButton from './TrashButton';
 import EditButton from './EditButton';
 
-export default class ActionItem extends Component<Props> {
+class ActionItem extends Component<Props> {
 
   onMoneyIconClick = () => {
     this.props.onMoneyIconClick();
@@ -24,6 +27,7 @@ export default class ActionItem extends Component<Props> {
 	render() {
 
     var { action_name, time, location, price, icon } = this.props;
+    console.log(this.props);
     var buttonMoney;
     var moneyInfo;
     var infoDateTime;
@@ -50,7 +54,7 @@ export default class ActionItem extends Component<Props> {
       right: [
         {
           onPress: () => {
-
+            this.props.onDelAction(this.props.action_id);
           },
           component: <TrashButton />, type: 'delete'
         },
@@ -131,3 +135,17 @@ const styles = StyleSheet.create({
     fontSize: 16
   }
 });
+
+const mapStateToProps = (state) => {
+  return {};
+}
+
+const mapDispatchToProps = (dispatch, props) => {
+  return {
+    onDelAction: (id) => {
+      dispatch(Actions.delAction(id));
+    }
+  }
+}
+
+export default connect(mapStateToProps,mapDispatchToProps, null, { withRef: true})(ActionItem);

@@ -1,7 +1,14 @@
 import * as Constants from '../constants/Constants';
 
 const Utils = {
-  formatDatetime:(year, month, day, format) => {
+  formatDateString:(input) => {
+    
+    var format = input.format;
+
+    year = JSON.stringify(input.year);
+    month = JSON.stringify(input.month);
+    day = JSON.stringify(input.day);
+
   	month = month.length == 1 ? '0' + month : month;
     day = day.length == 1 ? '0' + day : day;
 
