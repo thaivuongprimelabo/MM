@@ -12,6 +12,7 @@ import {
   Alert
 } from 'react-native';
 
+import { compose } from 'redux';
 import { connect } from 'react-redux';
 
 import * as Constants from '../constants/Constants';
@@ -35,7 +36,8 @@ class AddModal extends Component<Props> {
       name: '',
       price: '',
       type: '0',
-      location: ''
+      location: '',
+      ymd: ''
     };
   }
 
@@ -63,6 +65,18 @@ class AddModal extends Component<Props> {
   }
 
 	render() {
+
+    var { types_locations } = this.props;
+
+    var typeItem = types_locations.types.map((type, index) => {
+      return <Picker.Item key={index} label={ type.name } value={ type.id } />
+    });
+
+    var locationItem = types_locations.locations.map((location, index) => {
+      return <Picker.Item key={index} label={ location.name } value={ location.id } />
+    });
+
+
 		return (
       <Modal ref={'myModal'}
              style={{ justifyContent: 'center', borderRadius:5, shadowRadius: 10, width: screen.width - 30, height: 400  }} 
@@ -73,7 +87,7 @@ class AddModal extends Component<Props> {
       >
         <Text style={{ fontSize:16, fontWeight: 'bold', textAlign: 'center' }}>{ Constants.TXT_TITLE_ACTION_MODAL }</Text>
         <TextInput 
-            style={{ height:40, marginLeft:30, marginRight: 30,marginTop: 20, marginBottom: 10, borderBottomWidth: 1, borderBottomColor: '#888888' }}
+            style={{ height:40, marginLeft:30, marginRight: 30,marginTop: 20, marginBottom: 10,  }}
             onChangeText={(text) => this.setState({ name: text })}
             placeholder={ Constants.TXT_NAME }
             value={ this.state.name } />
@@ -83,21 +97,22 @@ class AddModal extends Component<Props> {
           style={{ height:40, marginLeft:30, marginRight: 30,marginTop: 10, marginBottom: 20 }}
           onValueChange={(itemValue, itemIndex) => this.setState({type: itemValue})}>
           <Picker.Item label={ Constants.TXT_SELECT_TYPE } value="0" />
-          <Picker.Item label="Java" value="java" />
-          <Picker.Item label="JavaScript" value="js" />
+          { typeItem }
         </Picker>
 
         <TextInput 
-            style={{ height:40, marginLeft:30, marginRight: 30,marginTop: 10, marginBottom: 20, borderBottomWidth: 1, borderBottomColor: '#888888'  }}
+            style={{ height:40, marginLeft:30, marginRight: 30,marginTop: 10, marginBottom: 20,   }}
             onChangeText={(text) => this.setState({ price: text })}
             placeholder={ Constants.TXT_PRICE }
             value={ this.state.price } />
 
-        <TextInput 
-            style={{ height:40, marginLeft:30, marginRight: 30,marginTop: 10, marginBottom: 20, borderBottomWidth: 1, borderBottomColor: '#888888'  }}
-            onChangeText={(text) => this.setState({ location: text })}
-            placeholder={ Constants.TXT_LOCATION }
-            value={ this.state.location } />
+        <Picker
+          selectedValue={this.state.location}
+          style={{ height:40, marginLeft:30, marginRight: 30,marginTop: 10, marginBottom: 20 }}
+          onValueChange={(itemValue, itemIndex) => this.setState({location: itemValue})}>
+          <Picker.Item label={ Constants.TXT_SELECT_LOCATION } value="0" />
+          { locationItem }
+        </Picker>
 
         <TouchableOpacity onPress={ this.addAction } style={{ padding:0, marginLeft: 70, marginRight: 70, height:40, borderRadius: 6, backgroundColor: '#1D2F3C',  justifyContent: 'center', alignItems: 'center' }}>
           <Text style={{ color:'#f0f0f0' }}>{ Constants.TXT_BUTTON_ADD }</Text>
@@ -107,4 +122,18 @@ class AddModal extends Component<Props> {
 	}
 }
 
-export default AddModal;
+const mapStateToProps = (state) => {
+  return {
+    types_locations: state.types_locations
+  };
+}
+
+const mapDispatchToProps = (dispatch, props) => {
+  return {
+    onAddAction: (formdata) => {
+      dispatch(Actions.onAddAction(formdata));
+    }
+  }
+}
+
+export default connect(mapStateToProps,null, null, { withRef: true})(AddModal);

@@ -88,13 +88,13 @@ class Month extends Component<Props> {
     this.refs.showMenuBotton.showActionSheet();
   }
 
-  onDayItemClick = (day) => {
+  onDayItemClick = (day, count) => {
     var { year, month } = this.state;
-    this.props.navigation.navigate('DayScreen', { month: month, year: year, day: day });
+    this.props.navigation.navigate('DayScreen', { month: month, year: year, day: day, count: count });
   }
 
   _renderItem = ({item}) => (
-      <TouchableOpacity style={ styles.infoMoneyItem } onPress={ () => this.onDayItemClick(item.id) }>
+      <TouchableOpacity style={ styles.infoMoneyItem } onPress={ () => this.onDayItemClick(item.id, item.count) }>
         <ListItem type={1} name={ item.id } budget={ item.budget } used={ item.used } remain={ item.remain } dayOfWeek= { item.dayOfWeek } />
       </TouchableOpacity>
   );

@@ -27,6 +27,11 @@ export default class MenuBottom extends Component<Props> {
 
     if(screen === 'DayScreen') {
 
+      if(index === 0) {
+        this.refs.myActionSheet.hide();
+        this.props.openAddModal();
+      }
+
       if(index === 3) {
         this.refs.myActionSheet.hide();
         this._logout();

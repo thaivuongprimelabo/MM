@@ -22,26 +22,33 @@ export const loadDataInMonth = (year, month, budget) => {
 	}
 }
 
-export const loadDataInDay = (year, month, day) => {
+export const loadDataInDay = (year, month, day, count) => {
 	return {
 		type : types.LOAD_DATA_IN_DAY,
 		year : year,
 		month : month,
-		day : day
+		day : day,
+		count: count
 	}
 }
 
-export const addAction = (action) => {
+export const getDataFromSqlite = () => {
+	return {
+		type : types.GET_DATA_FROM_SQLITE,
+	}
+}
+
+export const addAction = (formdata) => {
 	return {
 		type : types.ADD_ACTION,
-		action : action
+		formdata : formdata
 	}
 }
 
-export const editAction = (action) => {
+export const editAction = (formdata) => {
 	return {
 		type : types.EDIT_ACTION,
-		action : action
+		formdata : formdata
 	}
 }
 

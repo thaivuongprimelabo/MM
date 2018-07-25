@@ -23,20 +23,20 @@ export default class ActionItem extends Component<Props> {
 
 	render() {
 
-    var { type } = this.props;
+    var { action_name, time, location, price, icon } = this.props;
     var buttonMoney;
     var moneyInfo;
     var infoDateTime;
     infoDateTime = <View style={ styles.itemGroupLeft }>
-                    <Image source={ require('../img/coffee.png') } />
+                    <Image style={{width: 50, height: 50}} source={{ uri: icon }} />
                    </View>;
 
 
     moneyInfo = <View style={ styles.itemGroupCenter }>
-                  <Text style={styles.itemCode}><Image source={ require('../img/action.png') } style={{width: 40, height: 40}} /> { this.props.action_name } </Text>
-                  <Text style={styles.itemCode}><Image source={ require('../img/clock.png') } style={{width: 40, height: 40}} /> { this.props.time } </Text>
-                  <Text style={styles.itemCode}><Image source={ require('../img/location.png') } style={{width: 40, height: 40}} /> { this.props.location }</Text>
-                  <Text style={styles.itemCode}><Image source={ require('../img/price.png') } style={{width: 40, height: 40}} /> { Utils.formatCurrency(this.props.price, '.', '.') }</Text>
+                  <Text style={styles.itemCode}><Image source={ require('../img/action.png') } style={{width: 40, height: 40}} /> { action_name } </Text>
+                  <Text style={styles.itemCode}><Image source={ require('../img/clock.png') } style={{width: 40, height: 40}} /> { time } </Text>
+                  <Text style={styles.itemCode}><Image source={ require('../img/location.png') } style={{width: 40, height: 40}} /> { location }</Text>
+                  <Text style={styles.itemCode}><Image source={ require('../img/price.png') } style={{width: 40, height: 40}} /> { Utils.formatCurrency(price, '.', '.') }</Text>
                 </View>;
 
     const swipeSetting = {

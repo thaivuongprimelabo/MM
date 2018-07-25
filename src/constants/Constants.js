@@ -18,8 +18,9 @@ export const LOGIN_FAILED = 'Tài khoản hoặc mật khẩu không chính xác
 
 export const TXT_TITLE_ACTION_MODAL = 'Thông tin hoạt động';
 export const TXT_NAME = 'Tên hoạt động';
-export const TXT_SELECT_TYPE = 'Loại hoạt động';
-export const TXT_PRICE = 'Chi phí';
+export const TXT_SELECT_TYPE = 'Chọn loại hoạt động';
+export const TXT_SELECT_LOCATION = 'Chọn địa điểm';
+export const TXT_PRICE = 'Chi phí';``
 export const TXT_LOCATION = 'Vị trí';
 export const TXT_USERNAME = 'Tài khoản';
 export const TXT_PASSWORD = 'Mật khẩu';

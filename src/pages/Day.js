@@ -40,7 +40,7 @@ class Day extends Component<Props> {
       dataInDay: [],
       year: 0,
       month: 0,
-      nodatafound : false
+      count : 0
     }
   }
 
@@ -70,12 +70,14 @@ class Day extends Component<Props> {
     var year = navigation.getParam('year');
     var month = navigation.getParam('month');
     var day = navigation.getParam('day');
+    var count = navigation.getParam('count');
     this.setState({
       year : year,
       month : month,
-      day: day
+      day: day,
+      count: count,
     })
-    this.props.loadDataInDay(year, month, day);
+    this.props.loadDataInDay(year, month, day, count);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -102,11 +104,11 @@ class Day extends Component<Props> {
   }
 
   _openAddModal = () => {
-    this.refs.addModal.showAddModal();
+    this.refs.addModal.getWrappedInstance().showAddModal();
   }
 
   onActionClick = () => {
-    this.refs.addModal.showAddModal();
+    this._openAddModal();
   }
 
   openEditModal = () => {
@@ -114,7 +116,8 @@ class Day extends Component<Props> {
   }
 
   _renderItem = ({item, index}) => (
-      <ActionItem index={index} action_id={ item.id } action_name={ item.name } time={ item.time } location={ item.location } price={ item.price } openEditModal={ this.openEditModal } />
+
+      <ActionItem index={index} icon={ item.icon } action_id={ item.id } action_name={ item.name } time={ item.time } location={ item.location } price={ item.price } openEditModal={ this.openEditModal } />
   );
 
   addAction = (action) => {
@@ -122,11 +125,11 @@ class Day extends Component<Props> {
   }
 
   render() {
-    var { dataInDay, nodatafound } = this.state;
+    var { dataInDay, count, year, month, day } = this.state;
 
     var render = <Loading />;
-    var modal = <AddModal ref={'addModal'} parentFlatList={this} addAction={ this.addAction } />
-    var menuBottom = <MenuBottom ref={'showMenuBotton'} screen={'DayScreen'} navigation={this.props.navigation} />
+    var modal = <AddModal ref={'addModal'} parentFlatList={this} addAction={ this.addAction } ymd={ ymd } />
+    var menuBottom = <MenuBottom ref={'showMenuBotton'} screen={'DayScreen'} navigation={this.props.navigation} openAddModal={ this._openAddModal } />
 
     if(dataInDay.length) {
       render = <FlatList
@@ -137,7 +140,7 @@ class Day extends Component<Props> {
             renderItem={ this._renderItem } />;
     }
 
-    if(nodatafound) {
+    if(!count) {
       render = <NoDataFound />
     }
 
@@ -178,8 +181,8 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch, props) => {
     return {
-      loadDataInDay: (year, month, day) => {
-        dispatch(Actions.loadDataInDay(year, month, day));
+      loadDataInDay: (year, month, day, count) => {
+        dispatch(Actions.loadDataInDay(year, month, day, count));
       }
     };
 }
