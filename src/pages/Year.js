@@ -36,8 +36,13 @@ class Year extends Component<Props> {
   constructor(props) {
     super(props);
 
+    var date = new Date();
+    var year = date.getFullYear();
+
     this.state = {
-      dataInYear : []
+      dataInYear : [],
+      year: year,
+      user_id: 0
     }
   }
 
@@ -46,8 +51,9 @@ class Year extends Component<Props> {
   }
 
   componentDidMount() {
+
     this.props.navigation.setParams({ openMenuBottom: this._openMenuBottom });
-    this.props.loadDataInYear('2018');
+    this.props.loadDataInYear(this.state.year);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -84,11 +90,15 @@ class Year extends Component<Props> {
 
   onMonthItemClick = (month, budget) => {
     var currentYear = Utils.getCurrentYear();
-    this.props.navigation.navigate('MonthScreen', { month: month, year: currentYear, budget: budget});
+    this.props.navigation.navigate('MonthScreen', { month: month, year: currentYear, budget: budget, onBackFromMonth: this._onBackFromMonth });
   }
 
   _openMenuBottom = () => {
-    this.refs.showMenuBotton.showActionSheet();
+    this.refs.showMenuBotton.getWrappedInstance().showActionSheet();
+  }
+
+  _onBackFromMonth = () => {
+    this.props.loadDataInYear(this.state.year);
   }
 
   onMoneyIconClick = () => {
@@ -104,9 +114,13 @@ class Year extends Component<Props> {
   render() {
     
     var { dataInYear } = this.state;
+    var { navigation } = this.props;
+
+    var user_id = navigation.getParam('user_id');
+    
 
     var render = <Loading />;
-    var menuBottom = <MenuBottom ref={'showMenuBotton'} navigation={this.props.navigation}  />
+    var menuBottom = <MenuBottom ref={'showMenuBotton'} navigation={this.props.navigation} user_id={ user_id } />
 
     if(dataInYear.length) {
 

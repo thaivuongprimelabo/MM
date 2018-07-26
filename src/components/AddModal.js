@@ -33,12 +33,19 @@ class AddModal extends Component<Props> {
     super(props);
 
     this.state = {
-      name: 'AAAA',
-      price: '11111',
-      type: 4,
-      location: 7,
+      id: '',
+      name: '',
+      price: '',
+      type: 0,
+      location: 0,
       ymd: ''
     };
+  }
+
+  componentWillMount() {
+  }
+
+  componentWillReceiveProps(nextProps) {
   }
 
   addAction = () => {
@@ -60,7 +67,15 @@ class AddModal extends Component<Props> {
       var formdata = this.state;
       formdata['ymd'] = this.props.ymd;
       formdata['types_locations'] = this.props.types_locations;
-      this.props.onAddAction(formdata);
+
+      var { index } = this.props;
+
+      if(index === 999) {
+        this.props.onAddAction(formdata);
+      } else {
+        formdata['index'] = index;
+        this.props.onEditAction(formdata);
+      }
       this.refs.myModal.close();
     } else {
       Alert.alert(Constants.ALERT_TITLE_INFO, error);
@@ -69,7 +84,14 @@ class AddModal extends Component<Props> {
 
 	render() {
 
-    var { types_locations } = this.props;
+    var { types_locations, index } = this.props;
+
+    console.log(this.state);
+
+    var button_txt = Constants.TXT_BUTTON_UPDATE;
+    if(index === 999) {
+      button_txt = Constants.TXT_BUTTON_ADD;
+    }
 
     var typeItem = types_locations.types.map((type, index) => {
       return <Picker.Item key={index} label={ type.name } value={ type.id } />
@@ -85,6 +107,24 @@ class AddModal extends Component<Props> {
              style={{ justifyContent: 'center', borderRadius:5, shadowRadius: 10, width: screen.width - 30, height: 400  }} 
              position='center'
              backdrop={true}
+             onOpened={() => {
+              console.log('onOpened');
+              var { index, dataInDay } = this.props;
+              if(dataInDay.length > 0) {
+                if(this.state.id === '' && index !== 999) {
+                  var action = dataInDay[index];
+                  this.setState({
+                    id: action.id,
+                    name: action.name,
+                    price: action.price,
+                    type: action.type_id,
+                    location: action.location_id
+                  })
+                }
+                
+              }
+                
+             }}
              onClosed={() => {
              }}
       >
@@ -118,7 +158,7 @@ class AddModal extends Component<Props> {
         </Picker>
 
         <TouchableOpacity onPress={ this.addAction } style={{ padding:0, marginLeft: 70, marginRight: 70, height:40, borderRadius: 6, backgroundColor: '#1D2F3C',  justifyContent: 'center', alignItems: 'center' }}>
-          <Text style={{ color:'#f0f0f0' }}>{ Constants.TXT_BUTTON_ADD }</Text>
+          <Text style={{ color:'#f0f0f0' }}>{ button_txt }</Text>
         </TouchableOpacity>
       </Modal>
 		)
@@ -127,7 +167,8 @@ class AddModal extends Component<Props> {
 
 const mapStateToProps = (state) => {
   return {
-    types_locations: state.types_locations
+    types_locations: state.types_locations,
+    dataInDay: state.dataInDay
   };
 }
 
@@ -135,6 +176,9 @@ const mapDispatchToProps = (dispatch, props) => {
   return {
     onAddAction: (formdata) => {
       dispatch(Actions.addAction(formdata));
+    },
+    onEditAction: (formdata) => {
+      dispatch(Actions.editAction(formdata));
     }
   }
 }

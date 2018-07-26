@@ -48,12 +48,12 @@ class Welcome extends Component<Props> {
   _checkLogin() {
     try {
       db.transaction((tx) =>   {
-        tx.executeSql('SELECT * FROM ' + Constants.USERS_TBL, [], (tx, results) => { 
+        tx.executeSql('SELECT id FROM ' + Constants.USERS_TBL, [], (tx, results) => { 
           var len = results.rows.length;
           if(len === 0) {
             this.props.navigation.navigate('LoginScreen');
           } else {
-            this.props.navigation.navigate('YearScreen');
+            this.props.navigation.navigate('YearScreen', { user_id: results.rows.item(0).id });
           }
         });
       });

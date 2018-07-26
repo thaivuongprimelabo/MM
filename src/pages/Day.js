@@ -56,6 +56,11 @@ class Day extends Component<Props> {
       headerStyle: {
         backgroundColor: Constants.HEADER_BG_COLOR 
       },
+      headerLeft: (
+        <TouchableOpacity onPress={ navigation.getParam('onBackButton') }  style={{ marginLeft:10 }}>
+            <Image source={require('../img/back-button.png')}  />
+        </TouchableOpacity >
+      ),
       headerRight: (
         <TouchableOpacity onPress={ navigation.getParam('openMenuBottom') }  style={{ marginRight:10 }}>
             <Image source={require('../img/icon-menu.png')}  />
@@ -66,6 +71,7 @@ class Day extends Component<Props> {
 
   componentDidMount() {
     this.props.navigation.setParams({ openMenuBottom: this._openMenuBottom });
+    this.props.navigation.setParams({ onBackButton: this._onBackButton });
     var { navigation  } = this.props;
 
     var year = navigation.getParam('year');
@@ -78,7 +84,8 @@ class Day extends Component<Props> {
       month : month,
       day: day,
       count: count,
-      ymd: ymd
+      ymd: ymd,
+      index: 999
     })
     this.props.loadDataInDay(year, month, day, count);
   }
@@ -95,7 +102,12 @@ class Day extends Component<Props> {
   }
 
   _openMenuBottom = () => {
-    this.refs.showMenuBotton.showActionSheet();
+    this.refs.showMenuBotton.getWrappedInstance().showActionSheet();
+  }
+
+  _onBackButton = () => {
+    this.props.navigation.state.params.onBackFromDay();
+    this.props.navigation.goBack();
   }
 
   _openAddModal = () => {
@@ -106,33 +118,41 @@ class Day extends Component<Props> {
     this._openAddModal();
   }
 
-  openEditModal = () => {
+  openEditModal = (index) => {
+    this.setState({
+      index: index
+    })
     this._openAddModal();
   }
 
   _renderItem = ({item, index}) => (
 
-      <ActionItem index={index} icon={ item.icon } action_id={ item.id } action_name={ item.name } time={ item.time } location={ item.location } price={ item.price } openEditModal={ this.openEditModal } />
+      <ActionItem index={index} openEditModal={ this.openEditModal } />
   );
 
   render() {
-    var { dataInDay, year, month, day, ymd, count } = this.state;
+    var { dataInDay, year, month, day, ymd, count, index } = this.state;
 
     var render = <Loading />;
-    var modal = <AddModal ref={'addModal'} parentFlatList={this} ymd={ ymd } />
+    var modal = <AddModal ref={'addModal'} parentFlatList={this} ymd={ ymd } index={ index } />
     var menuBottom = <MenuBottom ref={'showMenuBotton'} screen={'DayScreen'} navigation={this.props.navigation} openAddModal={ this._openAddModal } />
 
-    if(!count) {
-      render = <NoDataFound />;
-    }
+    // if(!count) {
+    //   render = <NoDataFound />;
+    // }
 
     if(dataInDay.length) {
-      render = <FlatList
+      if(dataInDay[0].id !== 999) {
+        render = <FlatList
             contentContainerStyle={styles.list}
             data={dataInDay}
             extraData={this.state}
             keyExtractor={(item, index) => index.toString()}
             renderItem={ this._renderItem } />;
+      } else {
+        render = <NoDataFound />;
+      }
+      
     }
 
     return (

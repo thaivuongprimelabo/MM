@@ -52,10 +52,10 @@ export const editAction = (formdata) => {
 	}
 }
 
-export const delAction = (id) => {
+export const delAction = (index) => {
 	return {
 		type : types.DEL_ACTION,
-		id : id
+		index : index
 	}
 }
 
@@ -63,5 +63,19 @@ export const loginAction = (loginInfo) => {
 	return {
 		type: types.LOGIN_ACTION,
 		loginInfo: loginInfo
+	}
+}
+
+export const syncAction = (user_id) => {
+	return {
+		type: types.SYNC_DATA,
+		user_id: user_id
+	}
+}
+
+export const sendAction = () => {
+	return {
+		type: types.SEND_DATA,
+		user_id: user_id
 	}
 }

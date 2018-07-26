@@ -35,7 +35,8 @@ class Month extends Component<Props> {
     this.state = {
       dataInMonth: [],
       year: 0,
-      month: 0
+      month: 0,
+      budget: 0
     }
   }
 
@@ -51,6 +52,11 @@ class Month extends Component<Props> {
       headerStyle: {
         backgroundColor: Constants.HEADER_BG_COLOR 
       },
+      headerLeft: (
+        <TouchableOpacity onPress={ navigation.getParam('onBackButton') }  style={{ marginLeft:10 }}>
+            <Image source={require('../img/back-button.png')}  />
+        </TouchableOpacity >
+      ),
       headerRight: (
         <TouchableOpacity onPress={ navigation.getParam('openMenuBottom') }  style={{ marginRight:10 }}>
             <Image source={require('../img/icon-menu.png')}  />
@@ -61,19 +67,22 @@ class Month extends Component<Props> {
 
   componentDidMount() {
     this.props.navigation.setParams({ openMenuBottom: this._openMenuBottom });
+    this.props.navigation.setParams({ onBackButton: this._onBackButton });
     var { navigation  } = this.props;
     var year = navigation.getParam('year');
     var month = navigation.getParam('month');
     var budget = navigation.getParam('budget');
     this.setState({
       year : year,
-      month : month
+      month : month,
+      budget: budget
     });
     
     this.props.loadDataInMonth(year, month, budget);
   }
 
   componentWillReceiveProps(nextProps) {
+    console.log('componentWillReceiveProps');
     var { dataInMonth } = nextProps;
     if(dataInMonth.length) {
       this.interval = setTimeout(() => {
@@ -85,12 +94,22 @@ class Month extends Component<Props> {
   }
 
   _openMenuBottom = () => {
-    this.refs.showMenuBotton.showActionSheet();
+    this.refs.showMenuBotton.getWrappedInstance().showActionSheet();
+  }
+
+  _onBackButton = () => {
+    this.props.navigation.state.params.onBackFromMonth();
+    this.props.navigation.goBack();
   }
 
   onDayItemClick = (day, count) => {
     var { year, month } = this.state;
-    this.props.navigation.navigate('DayScreen', { month: month, year: year, day: day, count: count });
+    this.props.navigation.navigate('DayScreen', { month: month, year: year, day: day, count: count, onBackFromDay: this._onBackFromDay });
+  }
+
+  _onBackFromDay = () => {
+    var { year, month, budget } = this.state;
+    this.props.loadDataInMonth(year, month, budget);
   }
 
   _renderItem = ({item}) => (

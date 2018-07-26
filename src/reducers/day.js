@@ -18,7 +18,7 @@ var myReducer = (state = initialState, action) => {
 			if(action.count > 0) {
 
 				for(var i = 0; i < action.count; i++) {
-					var object = { id: 1, name: '', time: '', location: '', price: '', type: '', icon: '' };
+					var object = { id: 1, name: '', time: '', location: '', location_id: '', price: '', type_id: '', icon: '' };
 					tempData.push(object);
 				}
 
@@ -47,19 +47,28 @@ var myReducer = (state = initialState, action) => {
 			        			tempData[i].location = work.location;
 			        			tempData[i].price = work.cost;
 			        			tempData[i].icon = work.icon;
+			        			tempData[i].location_id = work.location_id;
+			        			tempData[i].type_id = work.type_id;
 			        		}
 			        		
 			        	}
 			        });
 			    });
+			} else {
+				tempData.push({id: 999});
 			}
 			
 			state = tempData;
 
 			return [...state];
+
 		case types.ADD_ACTION:
 
-			var obj = {id: 9999, name: '', time: '', location: '', price: '', icon: Constants.DEFAULT_ICON};
+			if(state[0].id === 999) {
+				state.splice(0, 1);
+			}
+
+			var obj = {id: 999, name: '', time: '', location: '', location_id: 0, price: '', icon: Constants.DEFAULT_ICON, type_id: 0};
 
 			var data = action.formdata;
 			var created_at = Utils.getCurrentDate('YYYY-MM-DD HH:II:SS');
@@ -69,7 +78,8 @@ var myReducer = (state = initialState, action) => {
 				sql +='VALUES("' + data.name + '", "' + data.price + '", "' + data.ymd  + '", ' + data.location + ', "", ' + data.type + ', ' + Constants.NOT_SYNC + ', "' + created_at + '", "' + updated_at + '")';
 
 			db.transaction((tx) => {
-		        tx.executeSql(sql, [], (tx, results) => { 
+		        tx.executeSql(sql, [], (tx, results) => {
+		        	console.log(results);
 		        	if(results.rowsAffected > 0) {
 
 		        		var len = data.types_locations.locations.length;
@@ -90,14 +100,14 @@ var myReducer = (state = initialState, action) => {
 		        			}
 		        		}
 
-		        		console.log(data.types_locations);
-
 		        		obj.id = results.insertId;
 		        		obj.name = data.name;
 		        		obj.time = created_at;
-		        		obj.location = location; 
+		        		obj.location = location;
+		        		obj.location_id = data.location;
 		        		obj.price = data.price;
 		        		obj.icon = icon;
+		        		obj.type_id = data.type;
 		        		
 		        	}
 		        });
@@ -108,13 +118,61 @@ var myReducer = (state = initialState, action) => {
 		 	return [...state];
 
 		case types.EDIT_ACTION:
-			console.log(action);
+
+			var formdata = action.formdata;
+			var updated_at = Utils.getCurrentDate('YYYY-MM-DD HH:II:SS');
+
+			var sql = 'UPDATE ' + Constants.ACTIONS_TBL + ' ';
+				sql += 'SET name = "' + formdata.name + '", type_id = ' + formdata.type + ', location_id = ' + formdata.location + ', cost = "' + formdata.price + '", is_sync = ' + Constants.NOT_SYNC + ', updated_at = "' + updated_at + '" ';
+				sql += ' WHERE id = ' + formdata.id;
+
+			db.transaction((tx) => {
+		        tx.executeSql(sql, [], (tx, results) => { console.log(results) });
+		    });
+
+		    var currentAction = state[formdata.index];
+
+		    var len = formdata.types_locations.locations.length;
+    		var location = '';
+    		for(var i = 0; i < len; i++) {
+    			if(formdata.types_locations.locations[i].id === formdata.location) {
+    				location = formdata.types_locations.locations[i].name;
+    				break;
+    			}
+    		}
+
+    		len = formdata.types_locations.types.length;
+    		var icon = '';
+    		for(var i = 0; i < len; i++) {
+    			if(formdata.types_locations.types[i].id === formdata.type) {
+    				icon = formdata.types_locations.types[i].icon;
+    				break;
+    			}
+    		}
+
+		    currentAction.name = formdata.name;
+		    currentAction.price = formdata.price;
+		    currentAction.location = location;
+		    currentAction.icon = icon;
+
 			return [...state];
 
 		case types.DEL_ACTION:
+			var currentAction = state[action.index];
 			
+			var sql = 'DELETE FROM ' + Constants.ACTIONS_TBL + ' WHERE id = ' + currentAction.id;
 
+			db.transaction((tx) => {
+		        tx.executeSql(sql, [], (tx, results) => { console.log(results) });
+		    });
 
+			state.splice(action.index, 1);
+
+			if(state.length === 0) {
+				var obj = { id: 999 }
+				state.push(obj);
+			}
+		    
 			return [...state];
 		default:
 			return state;

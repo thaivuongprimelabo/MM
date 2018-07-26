@@ -138,6 +138,17 @@ const Utils = {
     });
 
     return response;
+  },
+
+  getActionById: (id, list) => {
+    var len = list.length;
+    if(len > 0) {
+      for(var i = 0; i < len; i++) {
+        if(list[i].id === id) {
+          return list[i];
+        }
+      }
+    }
   }
 }
 

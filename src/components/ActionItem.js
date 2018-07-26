@@ -6,7 +6,8 @@ import {
   Text,
   View,
   Image,
-  TouchableOpacity
+  TouchableOpacity,
+  Alert
 } from 'react-native';
 
 import { connect } from 'react-redux';
@@ -22,25 +23,28 @@ class ActionItem extends Component<Props> {
 
   onMoneyIconClick = () => {
     this.props.onMoneyIconClick();
+
+  }
+
+  componentDidMount() {
+
   }
 
 	render() {
 
-    var { action_name, time, location, price, icon } = this.props;
-    console.log(this.props);
-    var buttonMoney;
-    var moneyInfo;
-    var infoDateTime;
+    var { dataInDay, index } = this.props;
+    var action = dataInDay[index];
+
     infoDateTime = <View style={ styles.itemGroupLeft }>
-                    <Image style={{width: 50, height: 50}} source={{ uri: icon }} />
+                    <Image style={{width: 50, height: 50}} source={{ uri: action.icon }} />
                    </View>;
 
 
     moneyInfo = <View style={ styles.itemGroupCenter }>
-                  <Text style={styles.itemCode}><Image source={ require('../img/action.png') } style={{width: 40, height: 40}} /> { action_name } </Text>
-                  <Text style={styles.itemCode}><Image source={ require('../img/clock.png') } style={{width: 40, height: 40}} /> { time } </Text>
-                  <Text style={styles.itemCode}><Image source={ require('../img/location.png') } style={{width: 40, height: 40}} /> { location }</Text>
-                  <Text style={styles.itemCode}><Image source={ require('../img/price.png') } style={{width: 40, height: 40}} /> { Utils.formatCurrency(price, '.', '.') }</Text>
+                  <Text style={styles.itemCode}><Image source={ require('../img/action.png') } style={{width: 40, height: 40}} /> { action.name } </Text>
+                  <Text style={styles.itemCode}><Image source={ require('../img/clock.png') } style={{width: 40, height: 40}} /> { action.time } </Text>
+                  <Text style={styles.itemCode}><Image source={ require('../img/location.png') } style={{width: 40, height: 40}} /> { action.location }</Text>
+                  <Text style={styles.itemCode}><Image source={ require('../img/price.png') } style={{width: 40, height: 40}} /> { Utils.formatCurrency(action.price, '.', '.') }</Text>
                 </View>;
 
     const swipeSetting = {
@@ -54,13 +58,22 @@ class ActionItem extends Component<Props> {
       right: [
         {
           onPress: () => {
-            this.props.onDelAction(this.props.action_id);
+            Alert.alert(
+              Constants.ALERT_TITLE_INFO,
+              Constants.TXT_CONFIRM_DEL,
+              [
+                {text: Constants.TXT_BUTTON_CANCEL, onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
+                {text: Constants.TXT_BUTTON_OK, onPress: () => { this.props.onDelAction(index) } },
+              ],
+              { cancelable: false }
+            )
+            
           },
           component: <TrashButton />, type: 'delete'
         },
         {
           onPress: () => {
-            this.props.openEditModal();
+            this.props.openEditModal(index);
           },
           component: <EditButton /> , type: 'edit'
         }
@@ -137,13 +150,15 @@ const styles = StyleSheet.create({
 });
 
 const mapStateToProps = (state) => {
-  return {};
+  return {
+    dataInDay: state.dataInDay
+  };
 }
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
-    onDelAction: (id) => {
-      dispatch(Actions.delAction(id));
+    onDelAction: (index) => {
+      dispatch(Actions.delAction(index));
     }
   }
 }

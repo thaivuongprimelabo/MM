@@ -24,10 +24,19 @@ export const TXT_PRICE = 'Chi phí';``
 export const TXT_LOCATION = 'Vị trí';
 export const TXT_USERNAME = 'Tài khoản';
 export const TXT_PASSWORD = 'Mật khẩu';
+export const TXT_CONFIRM_DEL = 'Bạn chắc chắn xóa không?';
 
 export const TXT_BUTTON_LOGIN = 'Đăng nhập';
 export const TXT_BUTTON_ADD = 'Đăng ký';
+export const TXT_BUTTON_UPDATE = 'Cập nhật';
+export const TXT_BUTTON_OK = 'Đồng ý';
+export const TXT_BUTTON_CANCEL = 'Bỏ qua';
 
+export const TXT_SYNC_DATA = 'Đồng bộ dữ liệu';
+export const TXT_SEND_DATA = 'Gửi dữ liệu';
+export const TXT_LOGOUT = 'Đăng xuất';
+export const TXT_CLOSE = 'Đóng';
+export const TXT_ADD_ACTION = 'Đăng ký hoạt động';
 
 export const DEFAULT_USER= 'vuongluu';
 export const DEFAULT_PASSWORD= '!23456Abc';

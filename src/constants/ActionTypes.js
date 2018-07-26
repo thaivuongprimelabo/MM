@@ -8,3 +8,5 @@ export const ADD_ACTION = 'ADD_ACTION';
 export const EDIT_ACTION = 'EDIT_ACTION';
 export const DEL_ACTION = 'DEL_ACTION';
 export const LOGIN_ACTION = 'LOGIN_ACTION';
+export const SYNC_DATA = 'SYNC_DATA';
+export const SEND_DATA = 'SEND_DATA';
