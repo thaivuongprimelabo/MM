@@ -25,6 +25,7 @@ export const TXT_LOCATION = 'Vị trí';
 export const TXT_USERNAME = 'Tài khoản';
 export const TXT_PASSWORD = 'Mật khẩu';
 export const TXT_CONFIRM_DEL = 'Bạn chắc chắn xóa không?';
+export const TXT_SYNC = 'Đang đồng bộ.Vui lòng chờ';
 
 export const TXT_BUTTON_LOGIN = 'Đăng nhập';
 export const TXT_BUTTON_ADD = 'Đăng ký';
@@ -57,3 +58,13 @@ export const ACTIONS_TBL= 'actions';
 export const SETTINGS_TBL= 'settings';
 export const LOCATIONS_TBL= 'locations';
 export const USERS_TBL= 'users';
+
+export const LOGIN_SCREEN = 'LoginScreen';
+export const DAY_SCREEN = 'DayScreen';
+export const MONTH_SCREEN = 'MonthScreen';
+export const YEAR_SCREEN = 'YearScreen';
+export const WELCOME_SCREEN = 'WelcomScreen';
+
+export const SYNC_WAITING = 0;
+export const SYNC_SUCCESS = 1;
+export const SYNC_FAIL = 2;

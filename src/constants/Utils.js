@@ -1,5 +1,8 @@
 import * as Constants from '../constants/Constants';
 
+var SQLite = require('react-native-sqlite-storage')
+var db = SQLite.openDatabase({name: 'test.db', createFromLocation: '~sqliteexample.db'}, this.errorCB, this.successCB);
+
 const Utils = {
   formatDateString:(input) => {
     
@@ -148,6 +151,138 @@ const Utils = {
           return list[i];
         }
       }
+    }
+  },
+
+  insertToSqlite: (json, isdelete) => {
+    // Types
+    var typeInsertSQL = '';
+    var types = json.types;
+    var lenTypes = types.length;
+    if(lenTypes > 0) {
+      typeInsertSQL = 'INSERT INTO ' + Constants.TYPES_TBL + ' VALUES ';
+      var value = '';
+      for(var i = 0; i < lenTypes; i++) {
+        var obj = types[i];
+        value += '(' + obj.value + ', "' + obj.name + '", "' + obj.color + '", "' + obj.icon + '", ' + Constants.IS_SYNC + ', ' + obj.order + ', "' + obj.created_at + '", "' + obj.updated_at + '"),';
+      }
+      typeInsertSQL = typeInsertSQL + value.substring(0, value.length - 1);
+    }
+
+    // Locations
+    var locationInsertSQL = '';
+    var locations = json.locations;
+    var lenLocations = json.locations.length;
+    if(lenLocations > 0) {
+      locationInsertSQL = 'INSERT INTO ' + Constants.LOCATIONS_TBL + ' VALUES ';
+      var value = '';
+      for(var i = 0; i < lenLocations; i++) {
+        var obj = locations[i];
+        value += '(' + obj.id + ', "' + obj.name + '", "' + obj.latlong + '", ' + Constants.IS_SYNC + ', "' + obj.address + '", "' + obj.desc_image + '", "' + obj.created_at + '", "' + obj.updated_at + '"),';
+      }
+      locationInsertSQL = locationInsertSQL + value.substring(0, value.length - 1);
+    }
+
+    // Actions
+    var actionInsertSQL = '';
+    var actions = json.actions;
+    var lenActions = json.actions.length;
+    if(lenActions > 0) {
+      actionInsertSQL = 'INSERT INTO ' + Constants.ACTIONS_TBL + ' VALUES ';
+      var value = '';
+      for(var i = 0; i < lenActions; i++) {
+        var obj = actions[i];
+        value += '(' + obj.id + ', "' + obj.name + '", "' + obj.cost + '", "' + obj.time + '", ' + obj.location_id + ', "' + obj.comment + '", ' + obj.type_id + ', ' + Constants.IS_SYNC + ', "' + obj.created_at + '", "' + obj.updated_at + '"),';
+      }
+      actionInsertSQL = actionInsertSQL + value.substring(0, value.length - 1);
+    }
+
+    // Users
+    var userInsertSQL = '';
+    var users = json.user_info;
+    if(users) {
+      var userInsertSQL = 'INSERT INTO ' + Constants.USERS_TBL + ' VALUES(' + users.id + ', "' + users.loginid + '", "123456") ';
+    }
+
+    // Insert sqlite
+    db.transaction((tx) =>   {
+      if(typeInsertSQL !== '') {
+        if(isdelete) {
+          tx.executeSql('DELETE FROM ' + Constants.TYPES_TBL, [], (tx, results) => { console.log(results); });
+        }
+        tx.executeSql(typeInsertSQL, [], (tx, results) => { console.log(results); });
+      }
+
+      if(locationInsertSQL !== '') {
+        if(isdelete) {
+          tx.executeSql('DELETE FROM ' + Constants.LOCATIONS_TBL, [], (tx, results) => { console.log(results); });
+        }
+        tx.executeSql(locationInsertSQL, [], (tx, results) => { console.log(results); });
+      }
+
+      if(actionInsertSQL !== '') {
+        if(isdelete) {
+          tx.executeSql('DELETE FROM ' + Constants.ACTIONS_TBL, [], (tx, results) => { console.log(results); });
+        }
+        tx.executeSql(actionInsertSQL, [], (tx, results) => { console.log(results); });
+      }
+
+      if(userInsertSQL !== '') {
+        if(isdelete) {
+          tx.executeSql('DELETE FROM ' + Constants.USERS_TBL, [], (tx, results) => { console.log(results); });
+        }
+        tx.executeSql(userInsertSQL, [], (tx, results) => { console.log(results); });
+      }
+    });
+
+    return {
+      typeInsertSQL,
+      locationInsertSQL,
+      actionInsertSQL,
+      userInsertSQL
+    }
+  },
+
+  getDataNotSync: async () => {
+    var actions = [];
+    var types = [];
+    var locations = [];
+    var sqlActions = 'SELECT * FROM ' + Constants.ACTIONS_TBL + ' WHERE is_sync = ' + Constants.NOT_SYNC;
+    var sqlTypes = 'SELECT * FROM ' + Constants.TYPES_TBL + ' WHERE is_sync = ' + Constants.NOT_SYNC;
+    var sqlLocations = 'SELECT * FROM ' + Constants.LOCATIONS_TBL + ' WHERE is_sync = ' + Constants.NOT_SYNC;
+    db.transaction((tx) =>   {
+      // Actions
+      tx.executeSql(sqlActions, [], (tx, results) => { 
+        var len = results.rows.length;
+        for(var i = 0; i < len; i++) {
+          var action = results.rows.item(i);
+          actions.push(action);
+        }
+      });
+
+      // Types
+      tx.executeSql(sqlTypes, [], (tx, results) => { 
+        var len = results.rows.length;
+        for(var i = 0; i < len; i++) {
+          var type = results.rows.item(i);
+          types.push(type);
+        }
+      });
+
+      // Locations
+      tx.executeSql(sqlLocations, [], (tx, results) => { 
+        var len = results.rows.length;
+        for(var i = 0; i < len; i++) {
+          var location = results.rows.item(i);
+          locations.push(location);
+        }
+      });
+    });
+
+    return {
+      actions,
+      types,
+      locations
     }
   }
 }

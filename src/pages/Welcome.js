@@ -51,9 +51,9 @@ class Welcome extends Component<Props> {
         tx.executeSql('SELECT id FROM ' + Constants.USERS_TBL, [], (tx, results) => { 
           var len = results.rows.length;
           if(len === 0) {
-            this.props.navigation.navigate('LoginScreen');
+            this.props.navigation.navigate(Constants.LOGIN_SCREEN);
           } else {
-            this.props.navigation.navigate('YearScreen', { user_id: results.rows.item(0).id });
+            this.props.navigation.navigate(Constants.YEAR_SCREEN, { user_id: results.rows.item(0).id });
           }
         });
       });

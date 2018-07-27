@@ -66,10 +66,10 @@ export const loginAction = (loginInfo) => {
 	}
 }
 
-export const syncAction = (user_id) => {
+export const updateSyncStatusAction = (status) => {
 	return {
-		type: types.SYNC_DATA,
-		user_id: user_id
+		type: types.UPDATE_SYNC_STATUS,
+		status: status
 	}
 }
 
@@ -77,5 +77,12 @@ export const sendAction = () => {
 	return {
 		type: types.SEND_DATA,
 		user_id: user_id
+	}
+}
+
+export const updateSendDataCount = (count) => {
+	return {
+		type: types.UPDATE_SEND_DATA_COUNT,
+		count: count
 	}
 }

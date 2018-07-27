@@ -76,6 +76,7 @@ class AddModal extends Component<Props> {
         formdata['index'] = index;
         this.props.onEditAction(formdata);
       }
+
       this.refs.myModal.close();
     } else {
       Alert.alert(Constants.ALERT_TITLE_INFO, error);
@@ -85,8 +86,6 @@ class AddModal extends Component<Props> {
 	render() {
 
     var { types_locations, index } = this.props;
-
-    console.log(this.state);
 
     var button_txt = Constants.TXT_BUTTON_UPDATE;
     if(index === 999) {
@@ -168,7 +167,8 @@ class AddModal extends Component<Props> {
 const mapStateToProps = (state) => {
   return {
     types_locations: state.types_locations,
-    dataInDay: state.dataInDay
+    dataInDay: state.dataInDay,
+    sync_send_data: state.sync_send_data
   };
 }
 
@@ -176,9 +176,11 @@ const mapDispatchToProps = (dispatch, props) => {
   return {
     onAddAction: (formdata) => {
       dispatch(Actions.addAction(formdata));
+      dispatch(Actions.updateSendDataCount(1));
     },
     onEditAction: (formdata) => {
       dispatch(Actions.editAction(formdata));
+      dispatch(Actions.updateSendDataCount(1));
     }
   }
 }

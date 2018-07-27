@@ -104,7 +104,7 @@ class Month extends Component<Props> {
 
   onDayItemClick = (day, count) => {
     var { year, month } = this.state;
-    this.props.navigation.navigate('DayScreen', { month: month, year: year, day: day, count: count, onBackFromDay: this._onBackFromDay });
+    this.props.navigation.navigate(Constants.DAY_SCREEN, { month: month, year: year, day: day, count: count, onBackFromDay: this._onBackFromDay });
   }
 
   _onBackFromDay = () => {

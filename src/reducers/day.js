@@ -160,7 +160,7 @@ var myReducer = (state = initialState, action) => {
 		case types.DEL_ACTION:
 			var currentAction = state[action.index];
 			
-			var sql = 'DELETE FROM ' + Constants.ACTIONS_TBL + ' WHERE id = ' + currentAction.id;
+			var sql = 'DELETE FROM ' + Constants.ACTIONS_TBL + ' WHERE id = ' + currentAction.id + ' AND IS_SYNC = ' + Constants.NOT_SYNC;
 
 			db.transaction((tx) => {
 		        tx.executeSql(sql, [], (tx, results) => { console.log(results) });

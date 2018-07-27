@@ -57,13 +57,19 @@ class Year extends Component<Props> {
   }
 
   componentWillReceiveProps(nextProps) {
-    var { dataInYear } = nextProps;
+    var { dataInYear, sync_send_data } = nextProps;
     if(dataInYear.length) {
       this.interval = setTimeout(() => {
         this.setState({
           dataInYear : dataInYear
         })
       }, Constants.DEFAULT_TIMEOUT);
+    }
+
+    if(sync_send_data.sync_status === Constants.SYNC_SUCCESS ) {
+      this.setState({
+        dataInYear : dataInYear
+      })
     }
   }
 
@@ -90,7 +96,7 @@ class Year extends Component<Props> {
 
   onMonthItemClick = (month, budget) => {
     var currentYear = Utils.getCurrentYear();
-    this.props.navigation.navigate('MonthScreen', { month: month, year: currentYear, budget: budget, onBackFromMonth: this._onBackFromMonth });
+    this.props.navigation.navigate(Constants.MONTH_SCREEN, { month: month, year: currentYear, budget: budget, onBackFromMonth: this._onBackFromMonth });
   }
 
   _openMenuBottom = () => {
@@ -114,7 +120,7 @@ class Year extends Component<Props> {
   render() {
     
     var { dataInYear } = this.state;
-    var { navigation } = this.props;
+    var { navigation, sync_send_data } = this.props;
 
     var user_id = navigation.getParam('user_id');
     
@@ -130,6 +136,10 @@ class Year extends Component<Props> {
                 extraData={this.state}
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={ this._renderItem } />;
+    }
+
+    if(sync_send_data.sync_status === Constants.SYNC_WAITING) {
+      render = <Loading sync={Constants.SYNC_WAITING} />;
     }
 
     return (
@@ -161,7 +171,8 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = (state) => {
     return {
-      dataInYear : state.dataInYear
+      dataInYear : state.dataInYear,
+      sync_send_data : state.sync_send_data
     };
 };
 

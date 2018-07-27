@@ -111,14 +111,8 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   itemGroupCenter: {
-    flex:0.5, 
+    flex:0.7, 
     flexDirection: 'column'
-  },
-  itemGroupRight: {
-    flex: 0.2,
-    flexDirection: 'column',
-    justifyContent:'center',
-    alignItems: 'center'
   },
   infoMoneyItem: {
     width: 44,
@@ -159,6 +153,7 @@ const mapDispatchToProps = (dispatch, props) => {
   return {
     onDelAction: (index) => {
       dispatch(Actions.delAction(index));
+      dispatch(Actions.updateSendDataCount(-1));
     }
   }
 }

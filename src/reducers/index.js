@@ -7,7 +7,7 @@ import day from './day';
 import types_locations from './types_locations';
 import locations from './locations';
 import actions from './actions';
-import menuBottom from './menuBottom';
+import sync_send_data from './sync_send_data';
 
 const myReducer = combineReducers({
 	login : login,
@@ -16,7 +16,7 @@ const myReducer = combineReducers({
 	dataInDay : day,
 	types_locations: types_locations,
 	actions: actions,
-	menuBottom: menuBottom
+	sync_send_data: sync_send_data
 });
 
 export default myReducer;
