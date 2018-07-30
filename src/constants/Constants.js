@@ -15,6 +15,8 @@ export const ERR_SELECT = 'Vui lòng chọn {0}';
 export const ERR_NUMBER = 'Vui nhập {0} là giá trị số';
 export const ERR_EMAIL = 'E-mail không hợp lệ';
 export const LOGIN_FAILED = 'Tài khoản hoặc mật khẩu không chính xác';
+export const SEND_DATA_SUCCESS = 'Đã gửi dữ liệu thành công.';
+export const SYNC_DATA_SUCCESS = 'Đã đồng bộ dữ liệu thành công.';
 
 export const TXT_TITLE_ACTION_MODAL = 'Thông tin hoạt động';
 export const TXT_NAME = 'Tên hoạt động';
@@ -52,6 +54,9 @@ export const DEFAULT_ICON = 'https://facebook.github.io/react-native/docs/assets
 
 export const IS_SYNC = 1;
 export const NOT_SYNC = 0;
+
+export const IS_DELETED = 1;
+export const NOT_DELETED = 0;
 
 export const TYPES_TBL= 'types';
 export const ACTIONS_TBL= 'actions';

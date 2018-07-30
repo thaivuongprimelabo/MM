@@ -77,6 +77,14 @@ class AddModal extends Component<Props> {
         this.props.onEditAction(formdata);
       }
 
+      this.setState({
+        id: '',
+        name: '',
+        price: '',
+        type: '',
+        location: ''
+      })
+
       this.refs.myModal.close();
     } else {
       Alert.alert(Constants.ALERT_TITLE_INFO, error);

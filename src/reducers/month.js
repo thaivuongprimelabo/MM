@@ -1,4 +1,5 @@
 import * as types from '../constants/ActionTypes';
+import * as Constants from '../constants/Constants';
 import Utils from '../constants/Utils';
 
 var SQLite = require('react-native-sqlite-storage')
@@ -23,7 +24,7 @@ var myReducer = (state = initialState, action) => {
 
 			var strYm = Utils.formatDateString({ year: action.year, month: action.month, day: 0, format: 'YYYYMM' });
 			var sql = 'SELECT act.name, substr(act.time, 7,2) as d, SUM(act.cost) as total_cost, count(act.id) as count FROM actions act ';
-		        	sql += 'WHERE substr(time, 1, 6) = "' + strYm + '" ';
+		        	sql += 'WHERE substr(time, 1, 6) = "' + strYm + '" AND (is_deleted = ' + Constants.NOT_DELETED + ' OR is_deleted IS NULL) ';
 		        	sql += 'GROUP BY act.time ';
 
 			db.transaction((tx) => {

@@ -30,8 +30,9 @@ var myReducer = (state = initialState, action) => {
 	      	];
 
 	      	var sql = 'SELECT substr(act.time,5,2) as m, sum(act.cost) as used FROM actions act ';
-		        sql    += 'GROUP BY substr(act.time,5,2) ';
-		        sql    += 'ORDER BY act.created_at DESC';
+	      		sql += 'WHERE is_deleted = ' + Constants.NOT_DELETED + ' OR is_deleted IS NULL ';
+		        sql += 'GROUP BY substr(act.time,5,2) ';
+		        sql += 'ORDER BY act.created_at DESC';
 		        
 			db.transaction((tx) => {
 		        

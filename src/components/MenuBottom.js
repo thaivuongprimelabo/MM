@@ -6,7 +6,8 @@ import {
   Text,
   View,
   ActivityIndicator,
-  AsyncStorage
+  AsyncStorage,
+  Alert
 } from 'react-native';
 
 import { connect } from 'react-redux';
@@ -95,8 +96,11 @@ class MenuBottom extends Component<Props> {
       if(responseJson.code === 200) {
         var json = JSON.parse(responseJson.data);
         Utils.insertToSqlite(json, false);
+        Alert.alert(Constants.ALERT_TITLE_INFO, Constants.SYNC_DATA_SUCCESS);
         this.props.onUpdateSyncStatus(Constants.SYNC_SUCCESS);
         this.props.loadDataInYear('2018');
+      } else {
+        Alert.alert(Constants.ALERT_TITLE_ERR, responseJson.message);
       }
     })
     .catch((error) =>{
@@ -134,9 +138,11 @@ class MenuBottom extends Component<Props> {
         })
         .then((response) => response.json())
         .then((responseJson) => {
-            console.log(responseJson);
             if(responseJson.code === 200) {
+              Alert.alert(Constants.ALERT_TITLE_INFO, Constants.SEND_DATA_SUCCESS);
               this.props.onUpdateSendDataCount();
+            } else {
+              Alert.alert(Constants.ALERT_TITLE_ERR, responseJson.message);
             }
 
         })

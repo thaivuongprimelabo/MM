@@ -30,7 +30,7 @@ var myReducer = (state = initialState, action) => {
 				var sql =  'SELECT act.*, lo.name as location, t.icon as icon FROM actions act ';
 					sql += 'LEFT JOIN locations lo ON lo.id = act.location_id ';
 					sql += 'LEFT JOIN types t ON t.value = act.type_id ';
-			       	sql += 'WHERE time = "' + strYmd + '" ';
+			       	sql += 'WHERE time = "' + strYmd + '" AND (is_deleted = ' + Constants.NOT_DELETED + ' OR is_deleted IS NULL)';
 
 			    db.transaction((tx) => {
 			        tx.executeSql(sql, [], (tx, results) => {
@@ -74,8 +74,8 @@ var myReducer = (state = initialState, action) => {
 			var created_at = Utils.getCurrentDate('YYYY-MM-DD HH:II:SS');
 			var updated_at = Utils.getCurrentDate('YYYY-MM-DD HH:II:SS');
 			
-			var sql = 'INSERT INTO ' + Constants.ACTIONS_TBL + '(name,cost,time,location_id,comment,type_id,is_sync,created_at,updated_at) ';
-				sql +='VALUES("' + data.name + '", "' + data.price + '", "' + data.ymd  + '", ' + data.location + ', "", ' + data.type + ', ' + Constants.NOT_SYNC + ', "' + created_at + '", "' + updated_at + '")';
+			var sql = 'INSERT INTO ' + Constants.ACTIONS_TBL + '(name,cost,time,location_id,comment,type_id,is_sync, is_deleted, created_at,updated_at) ';
+				sql +='VALUES("' + data.name + '", "' + data.price + '", "' + data.ymd  + '", ' + data.location + ', "", ' + data.type + ', ' + Constants.NOT_SYNC + ', ' + Constants.NOT_DELETED + ', "' + created_at + '", "' + updated_at + '")';
 
 			db.transaction((tx) => {
 		        tx.executeSql(sql, [], (tx, results) => {
@@ -159,8 +159,15 @@ var myReducer = (state = initialState, action) => {
 
 		case types.DEL_ACTION:
 			var currentAction = state[action.index];
+
+			var sql = 'DELETE FROM ' + Constants.ACTIONS_TBL + ' WHERE id = ' + currentAction.id;
+
+			if(currentAction.is_sync === Constants.IS_SYNC) {
+
+				sql = 'UPDATE ' + Constants.ACTIONS_TBL + ' SET is_deleted = ' + Constants.IS_DELETED  + ' WHERE id = ' + currentAction.id;
+			}
 			
-			var sql = 'DELETE FROM ' + Constants.ACTIONS_TBL + ' WHERE id = ' + currentAction.id + ' AND IS_SYNC = ' + Constants.NOT_SYNC;
+			console.log(sql);
 
 			db.transaction((tx) => {
 		        tx.executeSql(sql, [], (tx, results) => { console.log(results) });

@@ -192,7 +192,7 @@ const Utils = {
       var value = '';
       for(var i = 0; i < lenActions; i++) {
         var obj = actions[i];
-        value += '(' + obj.id + ', "' + obj.name + '", "' + obj.cost + '", "' + obj.time + '", ' + obj.location_id + ', "' + obj.comment + '", ' + obj.type_id + ', ' + Constants.IS_SYNC + ', "' + obj.created_at + '", "' + obj.updated_at + '"),';
+        value += '(' + obj.id + ', "' + obj.name + '", "' + obj.cost + '", "' + obj.time + '", ' + obj.location_id + ', "' + obj.comment + '", ' + obj.type_id + ', ' + Constants.IS_SYNC + ', ' + Constants.NOT_DELETED + ', "' + obj.created_at + '", "' + obj.updated_at + '"),';
       }
       actionInsertSQL = actionInsertSQL + value.substring(0, value.length - 1);
     }

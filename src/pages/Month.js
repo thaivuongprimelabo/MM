@@ -82,7 +82,6 @@ class Month extends Component<Props> {
   }
 
   componentWillReceiveProps(nextProps) {
-    console.log('componentWillReceiveProps');
     var { dataInMonth } = nextProps;
     if(dataInMonth.length) {
       this.interval = setTimeout(() => {
