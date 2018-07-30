@@ -39,49 +39,35 @@ class MenuBottom extends Component<Props> {
 
     var { screen } = this.props;
 
-    if(screen === 'DayScreen') {
+    // Open type modal
+    if(index === 0) {
+      this.refs.myActionSheet.hide();
+    }
 
-      if(index === 0) {
-        this.refs.myActionSheet.hide();
-        this.props.openAddModal();
-      }
+    // Open location modal
+    if(index === 1) {
+    }
 
-      // sync data
-      if(index === 1) {
-        this._onSyncData();
-      }
+    // Open action modal
+    if(index === 2) {
+      this.refs.myActionSheet.hide();
+      this.props.openAddModal();
+    }
 
-      // send data
-      if(index === 2) {
-        this._onSendData();
-      }
+    // sync data
+    if(index === 3) {
+      this._onSyncData();
+    }
 
-      // logout
-      if(index === 3) {
-        this.refs.myActionSheet.hide();
-        this._logout();
-      }
+    // send data
+    if(index === 4) {
+      this._onSendData();
+    }
 
-    } else {
-
-      // sync data
-      if(index === 0) {
-        //this.props.onSyncData(user_id);
-        this._onSyncData();
-      }
-
-      // send data
-      if(index === 1) {
-        // this.props.onSendData();
-        this._onSendData();
-      }
-
-      // Logout
-      if(index === 2) {
-        this.refs.myActionSheet.hide();
-        this._logout();
-      }
-
+    // logout
+    if(index === 5) {
+      this.refs.myActionSheet.hide();
+      this._logout();
     }
   }
 
@@ -213,20 +199,18 @@ class MenuBottom extends Component<Props> {
     var { screen, sync_send_data } = this.props;
 
     var options = [
+      Constants.TXT_ADD_TYPE,
+      Constants.TXT_ADD_LOCATION,
+      Constants.TXT_ADD_ACTION,
       Constants.TXT_SYNC_DATA, 
       Constants.TXT_SEND_DATA + '(' + sync_send_data.send_data_count + ')', 
       Constants.TXT_LOGOUT,
       Constants.TXT_CLOSE
     ]
 
-    var cancelButtonIndex = 3;
-    var destructiveButtonIndex = 2;
+    var cancelButtonIndex = 6;
+    var destructiveButtonIndex = 5;
 
-    if(screen === 'DayScreen') {
-      options.splice(0, 0, Constants.TXT_ADD_ACTION);
-      cancelButtonIndex = 4;
-      destructiveButtonIndex = 3;
-    }
 		return (
       <ActionSheet
         ref={'myActionSheet'}

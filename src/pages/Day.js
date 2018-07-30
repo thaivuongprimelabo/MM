@@ -78,7 +78,7 @@ class Day extends Component<Props> {
     var month = navigation.getParam('month');
     var day = navigation.getParam('day');
     var count = navigation.getParam('count');
-    var ymd = Utils.formatDateString({ year: year, month: month, day: day, format: 'YYYYMMDD' });
+    var ymd = Utils.formatDateString({ y: year, m: month, d: day, format: 'YYYYMMDD' });
     this.setState({
       year : year,
       month : month,
@@ -132,7 +132,6 @@ class Day extends Component<Props> {
 
   render() {
     var { dataInDay, year, month, day, ymd, count, index } = this.state;
-
     var render = <Loading />;
     var modal = <AddModal ref={'addModal'} parentFlatList={this} ymd={ ymd } index={ index } />
     var menuBottom = <MenuBottom ref={'showMenuBotton'} screen={'DayScreen'} navigation={this.props.navigation} openAddModal={ this._openAddModal } />

@@ -23,6 +23,7 @@ import ActionSheet from 'react-native-actionsheet';
 import ListItem from '../components/ListItem';
 import Loading from '../components/Loading';
 import MenuBottom from '../components/MenuBottom';
+import AddModal from '../components/AddModal';
 
 import * as Constants from '../constants/Constants';
 import * as Actions from '../actions/index';
@@ -95,8 +96,11 @@ class Year extends Component<Props> {
   };
 
   onMonthItemClick = (month, budget) => {
-    var currentYear = Utils.getCurrentYear();
-    this.props.navigation.navigate(Constants.MONTH_SCREEN, { month: month, year: currentYear, budget: budget, onBackFromMonth: this._onBackFromMonth });
+    this.props.navigation.navigate(Constants.MONTH_SCREEN, { month: month, year: this.state.year, budget: budget, onBackFromMonth: this._onBackFromMonth });
+  }
+
+  _openAddModal = () => {
+    this.refs.addModal.getWrappedInstance().showAddModal();
   }
 
   _openMenuBottom = () => {
@@ -122,11 +126,13 @@ class Year extends Component<Props> {
     var { dataInYear } = this.state;
     var { navigation, sync_send_data } = this.props;
 
+    var modal = <AddModal ref={'addModal'} parentFlatList={this} ymd={ this.state.year } index= { 998 } />
+
     var user_id = navigation.getParam('user_id');
     
 
     var render = <Loading />;
-    var menuBottom = <MenuBottom ref={'showMenuBotton'} navigation={this.props.navigation} user_id={ user_id } />
+    var menuBottom = <MenuBottom ref={'showMenuBotton'} navigation={this.props.navigation} user_id={ user_id } openAddModal={ this._openAddModal } />
 
     if(dataInYear.length) {
 
@@ -145,6 +151,7 @@ class Year extends Component<Props> {
     return (
       <View style={styles.container}>
         { render }
+        { modal }
         { menuBottom }
       </View>
     );
@@ -153,8 +160,7 @@ class Year extends Component<Props> {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    marginTop:7
+    flex: 1
   },
   list: {
   },

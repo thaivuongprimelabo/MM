@@ -18,7 +18,7 @@ var myReducer = (state = initialState, action) => {
 			if(action.count > 0) {
 
 				for(var i = 0; i < action.count; i++) {
-					var object = { id: 1, name: '', time: '', location: '', location_id: '', price: '', type_id: '', icon: '' };
+					var object = { id: 1, name: '', time: '', location: '', location_id: '', price: '', type_id: '', icon: '', created_at: '' };
 					tempData.push(object);
 				}
 
@@ -49,6 +49,7 @@ var myReducer = (state = initialState, action) => {
 			        			tempData[i].icon = work.icon;
 			        			tempData[i].location_id = work.location_id;
 			        			tempData[i].type_id = work.type_id;
+			        			tempData[i].created_at = work.created_at;
 			        		}
 			        		
 			        	}
@@ -63,15 +64,16 @@ var myReducer = (state = initialState, action) => {
 			return [...state];
 
 		case types.ADD_ACTION:
-
-			if(state[0].id === 999) {
+		
+			if(state.length > 0 && state[0].id === 999) {
 				state.splice(0, 1);
 			}
 
 			var obj = {id: 999, name: '', time: '', location: '', location_id: 0, price: '', icon: Constants.DEFAULT_ICON, type_id: 0};
 
 			var data = action.formdata;
-			var created_at = Utils.getCurrentDate('YYYY-MM-DD HH:II:SS');
+			console.log(data);
+			var created_at = data.created_at;
 			var updated_at = Utils.getCurrentDate('YYYY-MM-DD HH:II:SS');
 			
 			var sql = 'INSERT INTO ' + Constants.ACTIONS_TBL + '(name,cost,time,location_id,comment,type_id,is_sync, is_deleted, created_at,updated_at) ';

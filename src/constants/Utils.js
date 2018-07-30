@@ -4,22 +4,109 @@ var SQLite = require('react-native-sqlite-storage')
 var db = SQLite.openDatabase({name: 'test.db', createFromLocation: '~sqliteexample.db'}, this.errorCB, this.successCB);
 
 const Utils = {
+
+  formatZero: (str) => {
+    return str.length === 1 ? '0' + str : str;
+  },
   formatDateString:(input) => {
     
-    var format = input.format;
+    var format = 'YYYYMMDD';
+    if(input.format !== undefined) {
+      format = input.format;
+    }
 
-    year = JSON.stringify(input.year);
-    month = JSON.stringify(input.month);
-    day = JSON.stringify(input.day);
+    var year = input.y;
+    if(typeof input.y !== 'string' || !input.y instanceof String) {
+      year = JSON.stringify(input.y);
+    }
 
-  	month = month.length == 1 ? '0' + month : month;
-    day = day.length == 1 ? '0' + day : day;
+    var month = input.m;
+    if(typeof input.m !== 'string' || !input.m instanceof String) {
+      month = JSON.stringify(input.m);
+    }
+
+    var day = input.d;
+    if(typeof input.d !== 'string' || !input.d instanceof String) {
+      day = JSON.stringify(input.d);
+    }
+
+  	month = Utils.formatZero(month);
+    day = Utils.formatZero(day);
 
     format = format.replace('YYYY', year);
   	format = format.replace('MM', month);
   	format = format.replace('DD', day);
 
     return format;
+  },
+
+  formatDateTimeString:(input) => {
+    var format = "YYYY-MM-DD HH:II:SS";
+    if(input.format !== undefined) {
+      format = input.format;
+    }
+    
+    var year = input.y;
+    if(typeof input.y !== 'string' || !input.y instanceof String) {
+      year = JSON.stringify(input.y);
+    }
+    
+    var month = input.m;
+    if(typeof input.m !== 'string' || !input.m instanceof String) {
+      month = JSON.stringify(input.m);
+    }
+
+    var day = input.d;
+    if(typeof input.d !== 'string' || !input.d instanceof String) {
+      var day = JSON.stringify(input.d);
+    }
+
+    var hour = input.h;
+    if(typeof input.h !== 'string' || !input.h instanceof String) {
+      hour = JSON.stringify(input.h);
+    }
+
+    var minute = input.i;
+    if(typeof input.i !== 'string' || !input.i instanceof String) {
+      minute = JSON.stringify(input.i);
+    }
+
+    var second = input.s;
+    if(typeof input.s !== 'string' || !input.s instanceof String) {
+      second = JSON.stringify(input.s);
+    }
+
+    month = Utils.formatZero(month);
+    day = Utils.formatZero(day);
+
+    hour = Utils.formatZero(hour);
+    minute = Utils.formatZero(minute);
+    second = Utils.formatZero(second);
+
+    format = format.replace('YYYY', year);
+    format = format.replace('MM', month);
+    format = format.replace('DD', day);
+
+    format = format.replace('HH', hour);
+    format = format.replace('II', minute);
+    format = format.replace('SS', second);
+
+    return format;
+  },
+
+  extractDayString: (time) => {
+    var arr = time.split(' ');
+    var arr1 = arr[0].split('-');
+    var arr2 = arr[1].split(':');
+
+    return {
+      y : arr1[0],
+      m : arr1[1],
+      d : arr1[2],
+      h : arr2[0],
+      i : arr2[1],
+      s : arr2[2]
+    }
   },
 
   getCurrentDate: (format) => {

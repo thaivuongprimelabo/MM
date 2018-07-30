@@ -22,7 +22,7 @@ var myReducer = (state = initialState, action) => {
 		        tempData.push(day);
 		    }
 
-			var strYm = Utils.formatDateString({ year: action.year, month: action.month, day: 0, format: 'YYYYMM' });
+			var strYm = Utils.formatDateString({ y: action.year, m: action.month, d: 0, format: 'YYYYMM' });
 			var sql = 'SELECT act.name, substr(act.time, 7,2) as d, SUM(act.cost) as total_cost, count(act.id) as count FROM actions act ';
 		        	sql += 'WHERE substr(time, 1, 6) = "' + strYm + '" AND (is_deleted = ' + Constants.NOT_DELETED + ' OR is_deleted IS NULL) ';
 		        	sql += 'GROUP BY act.time ';
