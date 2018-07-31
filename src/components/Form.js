@@ -73,7 +73,21 @@ class Form extends Component<Props> {
         if(len === 0) {
           this.props.navigation.navigate('LoginScreen');
         } else {
-          this.props.navigation.navigate('YearScreen');
+
+          var params = { user_id: results.rows.item(0).id };
+
+          tx.executeSql('SELECT * FROM (SELECT COUNT(id) AS cnt FROM ' + Constants.LOCATIONS_TBL + ' UNION ALL SELECT COUNT(value) FROM ' + Constants.TYPES_TBL + ' )', [], (tx, results) => { 
+            var len = results.rows.length;
+            if(len > 0) {
+
+              params['location_cnt'] = results.rows.item(0).cnt;
+              params['type_cnt'] = results.rows.item(1).cnt;
+
+              console.log(params);
+
+              this.props.navigation.navigate(Constants.YEAR_SCREEN, params);
+            }
+          });
         }
       });
     });

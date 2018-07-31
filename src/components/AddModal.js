@@ -52,14 +52,38 @@ class AddModal extends Component<Props> {
       d: d,
       h: h,
       i: i,
-      s: s
+      s: s,
+      locations : [],
+      types: []
     };
   }
 
   componentWillMount() {
   }
 
+  componentDidMount() {
+    var { location_cnt, type_cnt } = this.props;
+    this.props.onLoadDataLocation(location_cnt);
+    this.props.onLoadDataType(type_cnt);
+  }
+
   componentWillReceiveProps(nextProps) {
+    var { locations, types } = nextProps;
+    if(locations.length) {
+      this.interval = setTimeout(() => {
+        this.setState({
+          locations : locations,
+        })
+      }, Constants.DEFAULT_TIMEOUT);
+    }
+
+    if(types.length) {
+      this.interval = setTimeout(() => {
+        this.setState({
+          types : types
+        })
+      }, Constants.DEFAULT_TIMEOUT);
+    }
   }
 
   addAction = () => {
@@ -97,11 +121,13 @@ class AddModal extends Component<Props> {
 
       formdata['created_at'] = Utils.formatDateTimeString(formdata);
       formdata['ymd'] = Utils.formatDateString(formdata);
-      formdata['types_locations'] = this.props.types_locations;
+      formdata['types'] = this.props.types;
+      formdata['locations'] = this.props.locations;
+      formdata['screen'] = this.props.screen;
 
       var { index } = this.props;
 
-      if(index === 999 || index === 998) {
+      if(index === 999) {
         this.props.onAddAction(formdata);
       } else {
         formdata['index'] = index;
@@ -117,6 +143,7 @@ class AddModal extends Component<Props> {
   }
 
   _resetForm = () => {
+
       var y = Utils.getCurrentDate('YYYY');
       var m = Utils.getCurrentDate('MM');
       var d = Utils.getCurrentDate('DD');
@@ -139,38 +166,39 @@ class AddModal extends Component<Props> {
         i: i,
         s: s
       });
-  }
+  } 
 
-	render() {
+  render() {
 
     var { types_locations, index } = this.props;
+    var { locations, types } = this.state;
 
     var button_txt = Constants.TXT_BUTTON_UPDATE;
     if(index === 999 || index === 998) {
       button_txt = Constants.TXT_BUTTON_ADD;
     }
 
-    var typeItem = types_locations.types.map((type, index) => {
-      return <Picker.Item key={index} label={ type.name } value={ type.id } />
+    var typeItem = types.map((type, index) => {
+      return <Picker.Item key={index} label={ type.name } value={ type.value } />
     });
 
-    var locationItem = types_locations.locations.map((location, index) => {
+    var locationItem = locations.map((location, index) => {
       return <Picker.Item key={index} label={ location.name } value={ location.id } />
     });
 
 
-		return (
+    return (
       <Modal ref={'myModal'}
              style={{ justifyContent: 'center', borderRadius:5, shadowRadius: 10, width: screen.width - 30, height: 450  }} 
              position='center'
              backdrop={true}
              onOpened={() => {
-              console.log('onOpened');
-              var { index, dataInDay } = this.props;
+              var { index, dataInDay, ymd } = this.props;
               if(index !== 999) {
                 if(dataInDay.length > 0 && this.state.id === '') {
                   var action = dataInDay[index];
                   var dayString = Utils.extractDayString(action.created_at);
+                  
                   this.setState({
                     id: action.id,
                     name: action.name,
@@ -185,9 +213,25 @@ class AddModal extends Component<Props> {
                     s: dayString.s
                   })
                 }
-              } 
+
+              } else {
+                if(ymd !== '') {
+                  var dayString = Utils.subStringDay(ymd);
+                  this.setState({
+                    y: dayString.y,
+                    m: dayString.m,
+                    d: dayString.d,
+                    h: dayString.h,
+                    i: dayString.i,
+                    s: dayString.s
+                  })
+                }
+              }
+
+              
              }}
              onClosed={() => {
+                this._resetForm();
              }}
       >
         <Text style={{ fontSize:16, fontWeight: 'bold', textAlign: 'center' }}>{ Constants.TXT_TITLE_ACTION_MODAL }</Text>
@@ -278,15 +322,16 @@ class AddModal extends Component<Props> {
           <Text style={{ color:'#f0f0f0' }}>{ button_txt }</Text>
         </TouchableOpacity>
       </Modal>
-		)
-	}
+    )
+  }
 }
 
 const mapStateToProps = (state) => {
   return {
-    types_locations: state.types_locations,
+    types: state.types,
     dataInDay: state.dataInDay,
-    sync_send_data: state.sync_send_data
+    sync_send_data: state.sync_send_data,
+    locations : state.locations
   };
 }
 
@@ -295,10 +340,23 @@ const mapDispatchToProps = (dispatch, props) => {
     onAddAction: (formdata) => {
       dispatch(Actions.addAction(formdata));
       dispatch(Actions.updateSendDataCount(1));
+      if(formdata.screen === Constants.YEAR_SCREEN) {
+        dispatch(Actions.loadDataInYear(formdata['y']));
+      }
+      if(formdata.screen === Constants.MONTH_SCREEN) {
+        var ym = formdata['y'] + formdata['m'];
+        dispatch(Actions.loadDataInMonth(ym));
+      }
     },
     onEditAction: (formdata) => {
       dispatch(Actions.editAction(formdata));
       dispatch(Actions.updateSendDataCount(1));
+    },
+    onLoadDataLocation: (cnt) => {
+      dispatch(Actions.loadDataLocation(cnt));
+    },
+    onLoadDataType: (cnt) => {
+      dispatch(Actions.loadDataType(cnt));
     }
   }
 }

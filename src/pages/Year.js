@@ -24,6 +24,8 @@ import ListItem from '../components/ListItem';
 import Loading from '../components/Loading';
 import MenuBottom from '../components/MenuBottom';
 import AddModal from '../components/AddModal';
+import AddLocation from '../components/AddLocation';
+import AddType from '../components/AddType';
 
 import * as Constants from '../constants/Constants';
 import * as Actions from '../actions/index';
@@ -43,7 +45,7 @@ class Year extends Component<Props> {
     this.state = {
       dataInYear : [],
       year: year,
-      user_id: 0
+      user_id: 0,
     }
   }
 
@@ -53,7 +55,12 @@ class Year extends Component<Props> {
 
   componentDidMount() {
 
+    var { navigation  } = this.props;
+
     this.props.navigation.setParams({ openMenuBottom: this._openMenuBottom });
+
+    
+
     this.props.loadDataInYear(this.state.year);
   }
 
@@ -103,6 +110,14 @@ class Year extends Component<Props> {
     this.refs.addModal.getWrappedInstance().showAddModal();
   }
 
+  _openAddTypeModal = () => {
+    this.refs.addType.getWrappedInstance().showAddTypeModal();
+  }
+
+  _openAddLocationModal = () => {
+    this.refs.addLocation.getWrappedInstance().showAddLocationModal();
+  }
+
   _openMenuBottom = () => {
     this.refs.showMenuBotton.getWrappedInstance().showActionSheet();
   }
@@ -126,13 +141,18 @@ class Year extends Component<Props> {
     var { dataInYear } = this.state;
     var { navigation, sync_send_data } = this.props;
 
-    var modal = <AddModal ref={'addModal'} parentFlatList={this} ymd={ this.state.year } index= { 998 } />
+    var type_cnt = navigation.getParam('type_cnt');
+    var location_cnt = navigation.getParam('location_cnt');
+
+    var modal = <AddModal ref={'addModal'} parentFlatList={this} ymd={ '' } index= { 999 } screen= { Constants.YEAR_SCREEN } location_cnt={ location_cnt } type_cnt={ type_cnt } />
+    var typeModal = <AddType ref={'addType'} parentFlatList={this} ymd={ '' } index= { 999 } screen= { Constants.YEAR_SCREEN } />
+    var locationModal = <AddLocation ref={'addLocation'} parentFlatList={this} ymd={ '' } index= { 999 } screen= { Constants.YEAR_SCREEN } />
 
     var user_id = navigation.getParam('user_id');
     
 
     var render = <Loading />;
-    var menuBottom = <MenuBottom ref={'showMenuBotton'} navigation={this.props.navigation} user_id={ user_id } openAddModal={ this._openAddModal } />
+    var menuBottom = <MenuBottom ref={'showMenuBotton'} navigation={this.props.navigation} user_id={ user_id } openAddModal={ this._openAddModal } openTypeModal={ this._openAddTypeModal } openLocationModal={ this._openAddLocationModal } />
 
     if(dataInYear.length) {
 
@@ -152,6 +172,8 @@ class Year extends Component<Props> {
       <View style={styles.container}>
         { render }
         { modal }
+        { typeModal }
+        { locationModal }
         { menuBottom }
       </View>
     );

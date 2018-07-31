@@ -41,11 +41,12 @@ class MenuBottom extends Component<Props> {
 
     // Open type modal
     if(index === 0) {
-      this.refs.myActionSheet.hide();
+      this.props.openTypeModal();
     }
 
     // Open location modal
     if(index === 1) {
+      this.props.openLocationModal();
     }
 
     // Open action modal
@@ -187,6 +188,9 @@ class MenuBottom extends Component<Props> {
 
   _logout() {
     db.transaction((tx) =>   {
+      tx.executeSql('DELETE FROM ' + Constants.LOCATIONS_TBL, [], (tx, results) => {});
+      tx.executeSql('DELETE FROM ' + Constants.TYPES_TBL, [], (tx, results) => {});
+      tx.executeSql('DELETE FROM ' + Constants.ACTIONS_TBL, [], (tx, results) => {});
       tx.executeSql('DELETE FROM ' + Constants.USERS_TBL, [], (tx, results) => { 
         if(results.rowsAffected === 1) {
           this.props.navigation.navigate('LoginScreen');

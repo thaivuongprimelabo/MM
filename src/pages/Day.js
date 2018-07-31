@@ -133,7 +133,7 @@ class Day extends Component<Props> {
   render() {
     var { dataInDay, year, month, day, ymd, count, index } = this.state;
     var render = <Loading />;
-    var modal = <AddModal ref={'addModal'} parentFlatList={this} ymd={ ymd } index={ index } />
+    var modal = <AddModal ref={'addModal'} parentFlatList={this} ymd={ ymd } index={ index }  screen={ Constants.DAY_SCREEN }  />
     var menuBottom = <MenuBottom ref={'showMenuBotton'} screen={'DayScreen'} navigation={this.props.navigation} openAddModal={ this._openAddModal } />
 
     // if(!count) {

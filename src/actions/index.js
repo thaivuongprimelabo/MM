@@ -32,6 +32,20 @@ export const loadDataInDay = (year, month, day, count) => {
 	}
 }
 
+export const loadDataLocation = (cnt) => {
+	return {
+		type: types.LOAD_DATA_LOCATION,
+		count: cnt
+	}
+}
+
+export const loadDataType = (cnt) => {
+	return {
+		type: types.LOAD_DATA_TYPE,
+		count: cnt
+	}
+}
+
 export const getDataFromSqlite = () => {
 	return {
 		type : types.GET_DATA_FROM_SQLITE,
@@ -41,6 +55,20 @@ export const getDataFromSqlite = () => {
 export const addAction = (formdata) => {
 	return {
 		type : types.ADD_ACTION,
+		formdata : formdata
+	}
+}
+
+export const addLocation = (formdata) => {
+	return {
+		type : types.ADD_LOCATION,
+		formdata : formdata
+	}
+}
+
+export const addType = (formdata) => {
+	return {
+		type : types.ADD_TYPE,
 		formdata : formdata
 	}
 }

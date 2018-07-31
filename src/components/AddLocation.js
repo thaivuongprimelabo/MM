@@ -23,19 +23,23 @@ import Modal from 'react-native-modalbox';
 
 var screen = Dimensions.get('window');
 
-class AddType extends Component<Props> {
+var SQLite = require('react-native-sqlite-storage')
+var db = SQLite.openDatabase({name: 'test.db', createFromLocation: '~sqliteexample.db'}, this.errorCB, this.successCB);
 
-  showAddTypeModal = () => {
-    this.refs.myTypeModal.open();
+class AddLocation extends Component<Props> {
+
+  showAddLocationModal = () => {
+    this.refs.myLocationModal.open();
   }
 
   constructor(props) {
     super(props);
 
     this.state = {
-      value: '',
+      id: '',
       name: '',
-      icon: Constants.DEFAULT_ICON
+      latlong: Constants.DEFAULT_LATLONG,
+      address: ''
     };
   }
 
@@ -45,20 +49,21 @@ class AddType extends Component<Props> {
   componentWillReceiveProps(nextProps) {
   }
 
-  _addType = () => {
+  _addLocation = () => {
     var error = '';
+
     if(this.state.name === '') {
       error += Utils.replactParamError(Constants.ERR_REQUIRED,[Constants.TXT_TYPE_NAME]) + "\n";
     }
 
     if(error === '') {
+
       var formdata = this.state;
 
-      this.props.onAddType(formdata);
-
+      this.props.onAddLocation(formdata);
       this._resetForm();
+      this.refs.myLocationModal.close();
 
-      this.refs.myTypeModal.close();
     } else {
       Alert.alert(Constants.ALERT_TITLE_INFO, error);
     }
@@ -66,9 +71,10 @@ class AddType extends Component<Props> {
 
   _resetForm = () => {
     this.setState({
-      value: '',
+      id: '',
       name: '',
-      icon: Constants.DEFAULT_ICON,
+      latlong: Constants.DEFAULT_LATLONG,
+      address: ''
     })
   }
 
@@ -82,7 +88,7 @@ class AddType extends Component<Props> {
     }
 
 		return (
-      <Modal ref={'myTypeModal'}
+      <Modal ref={'myLocationModal'}
              style={{ justifyContent: 'center', borderRadius:5, shadowRadius: 10, width: screen.width - 30, height: 400  }} 
              position='center'
              backdrop={true}
@@ -97,17 +103,23 @@ class AddType extends Component<Props> {
         <TextInput 
             style={{ height:40, marginLeft:30, marginRight: 30,marginTop: 20, marginBottom: 10,  }}
             onChangeText={(text) => this.setState({ name: text })}
-            placeholder={ Constants.TXT_TYPE_NAME }
+            placeholder={ Constants.TXT_LOCATION }
             value={ this.state.name } />
 
         <TextInput 
             style={{ height:40, marginLeft:30, marginRight: 30,marginTop: 20, marginBottom: 10,  }}
-            onChangeText={(text) => this.setState({ icon: text })}
-            placeholder={ Constants.TXT_ICON }
-            value={ this.state.icon } />
+            onChangeText={(text) => this.setState({ address: text })}
+            placeholder={ Constants.TXT_ADDRESS }
+            value={ this.state.address } />
+
+        <TextInput 
+            style={{ height:40, marginLeft:30, marginRight: 30,marginTop: 20, marginBottom: 10,  }}
+            onChangeText={(text) => this.setState({ latlong: text })}
+            placeholder={ Constants.TXT_LATLONG }
+            value={ this.state.latlong } />
         
 
-        <TouchableOpacity onPress={ this._addType } style={{ padding:0, marginLeft: 70, marginRight: 70, height:40, borderRadius: 6, backgroundColor: '#1D2F3C',  justifyContent: 'center', alignItems: 'center' }}>
+        <TouchableOpacity onPress={ this._addLocation } style={{ padding:0, marginLeft: 70, marginRight: 70, height:40, borderRadius: 6, backgroundColor: '#1D2F3C',  justifyContent: 'center', alignItems: 'center' }}>
           <Text style={{ color:'#f0f0f0' }}>{ button_txt }</Text>
         </TouchableOpacity>
       </Modal>
@@ -121,10 +133,10 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
-    onAddType: (formdata) => {
-      dispatch(Actions.addType(formdata));
+    onAddLocation: (formdata) => {
+      dispatch(Actions.addLocation(formdata));
     }
   }
 }
 
-export default connect(mapStateToProps,mapDispatchToProps, null, { withRef: true})(AddType);
+export default connect(mapStateToProps,mapDispatchToProps, null, { withRef: true})(AddLocation);

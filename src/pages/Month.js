@@ -163,7 +163,8 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = (state) => {
     return {
-      dataInMonth : state.dataInMonth
+      dataInMonth : state.dataInMonth,
+      types : state.types
     }
 };
 

@@ -41,7 +41,7 @@ const Utils = {
   },
 
   formatDateTimeString:(input) => {
-    var format = "YYYY-MM-DD HH:II:SS";
+    var format = Constants.DEFAULT_FORMAT_DATETIME;
     if(input.format !== undefined) {
       format = input.format;
     }
@@ -109,7 +109,25 @@ const Utils = {
     }
   },
 
+  subStringDay: (str) => {
+    var y = str.substring(0,4);
+    var m = str.substring(4,6);
+    var d = str.substring(6,8);
+    return {
+      y : y,
+      m : m,
+      d : d,
+      h : '00',
+      i : '00',
+      s : '00'
+    }
+  },
+
   getCurrentDate: (format) => {
+
+     if(format === undefined) {
+      format = Constants.DEFAULT_FORMAT_DATETIME;
+     }
   	 var date = new Date();
   	 var month = JSON.stringify(month);
 
@@ -141,6 +159,10 @@ const Utils = {
     var date = new Date();
     var year = date.getFullYear();
     return year;
+  },
+
+  generateId : () => {
+    return Math.floor((1 + Math.random()) * 0x10000);
   },
 
   formatCurrency: (nStr, decSeperate, groupSeperate) => {

@@ -1,5 +1,6 @@
 import * as types from '../constants/ActionTypes';
 import * as Constants from '../constants/Constants';
+import { Alert } from 'react-native';
 
 import Utils from '../constants/Utils';
 
@@ -72,7 +73,6 @@ var myReducer = (state = initialState, action) => {
 			var obj = {id: 999, name: '', time: '', location: '', location_id: 0, price: '', icon: Constants.DEFAULT_ICON, type_id: 0};
 
 			var data = action.formdata;
-			console.log(data);
 			var created_at = data.created_at;
 			var updated_at = Utils.getCurrentDate('YYYY-MM-DD HH:II:SS');
 			
@@ -84,20 +84,20 @@ var myReducer = (state = initialState, action) => {
 		        	console.log(results);
 		        	if(results.rowsAffected > 0) {
 
-		        		var len = data.types_locations.locations.length;
+		        		var len = data.locations.length;
 		        		var location = '';
 		        		for(var i = 0; i < len; i++) {
-		        			if(data.types_locations.locations[i].id === data.location) {
-		        				location = data.types_locations.locations[i].name;
+		        			if(data.locations[i].id === data.location) {
+		        				location = data.locations[i].name;
 		        				break;
 		        			}
 		        		}
 
-		        		len = data.types_locations.types.length;
+		        		len = data.types.length;
 		        		var icon = '';
 		        		for(var i = 0; i < len; i++) {
-		        			if(data.types_locations.types[i].id === data.type) {
-		        				icon = data.types_locations.types[i].icon;
+		        			if(data.types[i].id === data.type) {
+		        				icon = data.types[i].icon;
 		        				break;
 		        			}
 		        		}
@@ -110,6 +110,8 @@ var myReducer = (state = initialState, action) => {
 		        		obj.price = data.price;
 		        		obj.icon = icon;
 		        		obj.type_id = data.type;
+
+		        		Alert.alert(Constants.ALERT_TITLE_INFO, Constants.REGISTER_DATA_SUCCESS);
 		        		
 		        	}
 		        });
