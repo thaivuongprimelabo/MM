@@ -21,6 +21,9 @@ import Utils from '../constants/Utils';
 
 import Modal from 'react-native-modalbox';
 
+var SQLite = require('react-native-sqlite-storage')
+var db = SQLite.openDatabase({name: 'test.db', createFromLocation: '~sqliteexample.db'}, this.errorCB, this.successCB);
+
 var screen = Dimensions.get('window');
 
 class AddType extends Component<Props> {
@@ -54,7 +57,19 @@ class AddType extends Component<Props> {
     if(error === '') {
       var formdata = this.state;
 
-      this.props.onAddType(formdata);
+      var created_at = updated_at = Utils.getCurrentDate();
+      var id = Utils.generateId();
+      var sql = 'INSERT INTO ' + Constants.TYPES_TBL + '(value, name, color, icon, is_sync, `order`, created_at, updated_at) VALUES ';
+      sql += '(' + id  +',"' + formdata.name + '", "", "' + formdata.icon + '", "' + Constants.NOT_SYNC + '",90,"' + created_at + '", "' + updated_at + '")';
+        
+      db.transaction((tx) => {
+          tx.executeSql(sql, [], (tx, results) => {
+              if(results.rowsAffected > 0) {
+                  this.props.onAddType(formdata);
+                  Alert.alert(Constants.ALERT_TITLE_INFO, Constants.REGISTER_DATA_SUCCESS);
+              }
+          });
+      });
 
       this._resetForm();
 

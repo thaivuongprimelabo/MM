@@ -202,13 +202,13 @@ const Utils = {
     var d = new Date(year, month, day);
 
     var weekday = new Array(7);
-    weekday[0] = "Sunday";
-    weekday[1] = "Monday";
-    weekday[2] = "Tuesday";
-    weekday[3] = "Wednesday";
-    weekday[4] = "Thursday";
-    weekday[5] = "Friday";
-    weekday[6] = "Saturday";
+    weekday[0] = Constants.SUNDAY;
+    weekday[1] = Constants.MONDAY;
+    weekday[2] = Constants.TUESDAY;
+    weekday[3] = Constants.WEDNESDAY;
+    weekday[4] = Constants.THURSDAY;
+    weekday[5] = Constants.FRIDAY;
+    weekday[6] = Constants.SATURDAY;
 
     return weekday[d.getDay()];
   },

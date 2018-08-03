@@ -94,6 +94,12 @@ export const loginAction = (loginInfo) => {
 	}
 }
 
+export const updateRowSyncStatusAction = () => {
+	return {
+		type: types.UPDATE_ROW_SYNC_STATUS
+	}
+}
+
 export const updateSyncStatusAction = (status) => {
 	return {
 		type: types.UPDATE_SYNC_STATUS,

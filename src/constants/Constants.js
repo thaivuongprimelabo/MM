@@ -20,8 +20,11 @@ export const SEND_DATA_SUCCESS = 'Đã gửi dữ liệu thành công.';
 export const SYNC_DATA_SUCCESS = 'Đã đồng bộ dữ liệu thành công.';
 export const REGISTER_DATA_SUCCESS = 'Đã đăng ký thành công.';
 export const UPDATE_DATA_SUCCESS = 'Đã cập nhật thành công.';
+export const NO_DATA_SEND = 'Không có dữ liệu cần gửi';
+export const NO_DATA_SYNC = 'Không có dữ liệu mới từ máy chủ';
 
 export const TXT_TITLE_ACTION_MODAL = 'Thông tin hoạt động';
+export const TXT_TITLE_BUDGET_MODAL = 'Định mức tháng {0}';
 export const TXT_NAME = 'Tên hoạt động';
 export const TXT_TYPE_NAME = 'Loại hoạt động';
 export const TXT_SELECT_TYPE = 'Chọn loại hoạt động';
@@ -36,6 +39,7 @@ export const TXT_USERNAME = 'Tài khoản';
 export const TXT_PASSWORD = 'Mật khẩu';
 export const TXT_CONFIRM_DEL = 'Bạn chắc chắn xóa không?';
 export const TXT_SYNC = 'Đang đồng bộ.Vui lòng chờ';
+export const TXT_BUDGET = 'Định mức';
 
 export const TXT_BUTTON_LOGIN = 'Đăng nhập';
 export const TXT_BUTTON_ADD = 'Đăng ký';
@@ -85,3 +89,11 @@ export const WELCOME_SCREEN = 'WelcomScreen';
 export const SYNC_WAITING = 0;
 export const SYNC_SUCCESS = 1;
 export const SYNC_FAIL = 2;
+
+export const MONDAY = 'Thứ hai';
+export const TUESDAY = 'Thứ ba';
+export const WEDNESDAY = 'Thứ tư';
+export const THURSDAY = 'Thứ năm';
+export const FRIDAY = 'Thứ sáu';
+export const SATURDAY = 'Thứ bảy';
+export const SUNDAY = 'Chủ Nhật';

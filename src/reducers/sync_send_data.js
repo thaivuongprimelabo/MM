@@ -11,7 +11,10 @@ var initialState = {
 var SQLite = require('react-native-sqlite-storage')
 var db = SQLite.openDatabase({name: 'test.db', createFromLocation: '~sqliteexample.db'}, this.errorCB, this.successCB);
 
-var sql = 'SELECT COUNT(id) as count FROM ' + Constants.ACTIONS_TBL + ' WHERE is_sync = ' + Constants.NOT_SYNC;
+var sql = 'SELECT SUM(count) as count FROM ( ';
+	sql += ' SELECT COUNT(id) as count FROM ' + Constants.ACTIONS_TBL + ' WHERE is_sync = ' + Constants.NOT_SYNC + ' UNION ALL ';
+	sql += ' SELECT COUNT(id) as count FROM ' + Constants.LOCATIONS_TBL + ' WHERE is_sync = ' + Constants.NOT_SYNC + ' UNION ALL ';
+	sql += ' SELECT COUNT(value) as count FROM ' + Constants.TYPES_TBL + ' WHERE is_sync = ' + Constants.NOT_SYNC + ' )';
 
 db.transaction((tx) => {
 	tx.executeSql(sql, [], (tx, results) => {
@@ -39,12 +42,9 @@ var myReducer = (state = initialState, action) => {
 
 		case types.UPDATE_SEND_DATA_COUNT:
 
-			if(action.count === 0) {
-				state.send_data_count = action.count;
-			} else {
-				state.send_data_count = state.send_data_count + action.count;
-			}
 			
+			state.send_data_count = action.count;
+
 			return Object.assign({}, state);
 			break;
 		default:

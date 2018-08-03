@@ -23,6 +23,8 @@ import ActionItem from '../components/ActionItem';
 import Loading from '../components/Loading';
 import NoDataFound from '../components/NoDataFound';
 import AddModal from '../components/AddModal';
+import AddLocation from '../components/AddLocation';
+import AddType from '../components/AddType';
 import MenuBottom from '../components/MenuBottom';
 
 import * as Constants from '../constants/Constants';
@@ -91,13 +93,19 @@ class Day extends Component<Props> {
   }
 
   componentWillReceiveProps(nextProps) {
-    var { dataInDay } = nextProps;
+    var { dataInDay, sync_send_data } = nextProps;
     if(dataInDay.length) {
         this.interval = setTimeout(() => {
           this.setState({
             dataInDay : dataInDay
           });
         }, Constants.DEFAULT_TIMEOUT);
+    }
+
+    if(sync_send_data.sync_status === Constants.SYNC_SUCCESS ) {
+      this.setState({
+        dataInDay : dataInDay
+      })
     }
   }
 
@@ -112,6 +120,14 @@ class Day extends Component<Props> {
 
   _openAddModal = () => {
     this.refs.addModal.getWrappedInstance().showAddModal();
+  }
+
+  _openAddTypeModal = () => {
+    this.refs.addType.getWrappedInstance().showAddTypeModal();
+  }
+
+  _openAddLocationModal = () => {
+    this.refs.addLocation.getWrappedInstance().showAddLocationModal();
   }
 
   onActionClick = () => {
@@ -132,9 +148,12 @@ class Day extends Component<Props> {
 
   render() {
     var { dataInDay, year, month, day, ymd, count, index } = this.state;
+    var { sync_send_data } = this.props;
     var render = <Loading />;
-    var modal = <AddModal ref={'addModal'} parentFlatList={this} ymd={ ymd } index={ index }  screen={ Constants.DAY_SCREEN }  />
-    var menuBottom = <MenuBottom ref={'showMenuBotton'} screen={'DayScreen'} navigation={this.props.navigation} openAddModal={ this._openAddModal } />
+    var modal = <AddModal ref={'addModal'} parentFlatList={this} ymd={ ymd } index={ index }  screen={ Constants.DAY_SCREEN } openTypeModal={ this._openAddTypeModal } openLocationModal={ this._openAddLocationModal }   />
+    var typeModal = <AddType ref={'addType'} parentFlatList={this} ymd={ '' } index= { 999 } screen= { Constants.YEAR_SCREEN } />
+    var locationModal = <AddLocation ref={'addLocation'} parentFlatList={this} ymd={ '' } index= { 999 } screen= { Constants.YEAR_SCREEN } />
+    var menuBottom = <MenuBottom ref={'showMenuBotton'} screen={'DayScreen'} navigation={this.props.navigation} screen={ Constants.DAY_SCREEN } year= { this.state.year} month= { this.state.month } day={ this.state.day }  openAddModal={ this._openAddModal } openTypeModal={ this._openAddTypeModal } openLocationModal={ this._openAddLocationModal } />
 
     // if(!count) {
     //   render = <NoDataFound />;
@@ -154,13 +173,18 @@ class Day extends Component<Props> {
       
     }
 
+    if(sync_send_data.sync_status === Constants.SYNC_WAITING) {
+      render = <Loading sync={Constants.SYNC_WAITING} />;
+    }
+
     return (
       
         <View style={styles.container}>
           { render }
           { modal }
+          { typeModal }
+          { locationModal }
           { menuBottom }
-          
         </View>
     );
   }
@@ -186,7 +210,10 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = (state) => {
     return {
-      dataInDay : state.dataInDay
+      dataInDay : state.dataInDay,
+      types: state.types,
+      locations: state.locations,
+      sync_send_data : state.sync_send_data
     }
 };
 

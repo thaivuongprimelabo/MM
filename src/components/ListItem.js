@@ -15,7 +15,8 @@ import Utils from '../constants/Utils';
 export default class ListItem extends Component<Props> {
 
   onMoneyIconClick = () => {
-    this.props.onMoneyIconClick();
+    var { name } = this.props;
+    this.props.onMoneyIconClick(name);
   }
 
 	render() {
@@ -70,7 +71,6 @@ export default class ListItem extends Component<Props> {
           }}>
           { infoDateTime }
           { moneyInfo }
-          { buttonMoney }
         </View>
 		)
 	}

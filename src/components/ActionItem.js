@@ -19,6 +19,9 @@ import Swipeout from 'react-native-swipeout';
 import TrashButton from './TrashButton';
 import EditButton from './EditButton';
 
+var SQLite = require('react-native-sqlite-storage')
+var db = SQLite.openDatabase({name: 'test.db', createFromLocation: '~sqliteexample.db'}, this.errorCB, this.successCB);
+
 class ActionItem extends Component<Props> {
 
   onMoneyIconClick = () => {
@@ -30,22 +33,65 @@ class ActionItem extends Component<Props> {
 
   }
 
+  _del() {
+
+    var { dataInDay, index } = this.props;
+
+    var action = dataInDay[index];
+
+    var sql = 'DELETE FROM ' + Constants.ACTIONS_TBL + ' WHERE id = ' + action.id;
+
+    if(action.is_sync === Constants.IS_SYNC) {
+
+      sql = 'UPDATE ' + Constants.ACTIONS_TBL + ' SET is_deleted = ' + Constants.IS_DELETED  + ', is_sync = ' + Constants.NOT_SYNC + ' WHERE id = ' + action.id;
+    }
+
+    db.transaction((tx) => {
+      tx.executeSql(sql, [], (tx, results) => {
+
+        this.props.onDelAction(index);
+
+        var sql = 'SELECT SUM(count) as count FROM ( ';
+            sql += ' SELECT COUNT(id) as count FROM ' + Constants.ACTIONS_TBL + ' WHERE is_sync = ' + Constants.NOT_SYNC + ' UNION ALL ';
+            sql += ' SELECT COUNT(id) as count FROM ' + Constants.LOCATIONS_TBL + ' WHERE is_sync = ' + Constants.NOT_SYNC + ' UNION ALL ';
+            sql += ' SELECT COUNT(value) as count FROM ' + Constants.TYPES_TBL + ' WHERE is_sync = ' + Constants.NOT_SYNC + ' )';
+
+        db.transaction((tx) => {
+          tx.executeSql(sql, [], (tx, results) => {
+            var len = results.rows.length;
+            if(len > 0) {
+              var send_data_count = results.rows.item(0).count;
+              this.props.onUpdateSendDataCount(send_data_count);
+            }
+          });
+        });
+        
+      });
+    });
+  }
+
 	render() {
 
     var { dataInDay, index } = this.props;
     var action = dataInDay[index];
 
-    infoDateTime = <View style={ styles.itemGroupLeft }>
+    var infoDateTime = <View style={ styles.itemGroupLeft }>
                     <Image style={{width: 50, height: 50}} source={{ uri: action.icon }} />
                    </View>;
 
 
-    moneyInfo = <View style={ styles.itemGroupCenter }>
+    var moneyInfo = <View style={ styles.itemGroupCenter }>
                   <Text style={styles.itemCode}><Image source={ require('../img/action.png') } style={{width: 40, height: 40}} /> { action.name } </Text>
                   <Text style={styles.itemCode}><Image source={ require('../img/clock.png') } style={{width: 40, height: 40}} /> { action.time } </Text>
                   <Text style={styles.itemCode}><Image source={ require('../img/location.png') } style={{width: 40, height: 40}} /> { action.location }</Text>
                   <Text style={styles.itemCode}><Image source={ require('../img/price.png') } style={{width: 40, height: 40}} /> { Utils.formatCurrency(action.price, '.', '.') }</Text>
                 </View>;
+
+    var status_sync;
+    if(action.is_sync === Constants.IS_SYNC) {
+      var status_sync = <View style={ styles.itemGroupRight }><Image source={ require('../img/icon-check.png') } /></View>;
+    }
+    
 
     const swipeSetting = {
       autoClose: true,
@@ -63,7 +109,7 @@ class ActionItem extends Component<Props> {
               Constants.TXT_CONFIRM_DEL,
               [
                 {text: Constants.TXT_BUTTON_CANCEL, onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
-                {text: Constants.TXT_BUTTON_OK, onPress: () => { this.props.onDelAction(index) } },
+                {text: Constants.TXT_BUTTON_OK, onPress: () => { this._del() } },
               ],
               { cancelable: false }
             )
@@ -95,6 +141,7 @@ class ActionItem extends Component<Props> {
               <View style={{ flex:1, backgroundColor: '#ffffff', flexDirection: 'row'}}>
                 { infoDateTime }
                 { moneyInfo }
+                { status_sync }
               </View>
             </Swipeout>
           </View>
@@ -111,8 +158,14 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   itemGroupCenter: {
-    flex:0.7, 
+    flex:0.5, 
     flexDirection: 'column'
+  },
+  itemGroupRight: {
+    flex:0.2,
+    flexDirection: 'column',
+    justifyContent:'center',
+    alignItems:'center'
   },
   infoMoneyItem: {
     width: 44,
@@ -153,7 +206,9 @@ const mapDispatchToProps = (dispatch, props) => {
   return {
     onDelAction: (index) => {
       dispatch(Actions.delAction(index));
-      dispatch(Actions.updateSendDataCount(-1));
+    },
+    onUpdateSendDataCount: (count) => {
+      dispatch(Actions.updateSendDataCount(count));
     }
   }
 }

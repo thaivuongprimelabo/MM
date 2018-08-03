@@ -73,7 +73,9 @@ class MenuBottom extends Component<Props> {
   }
 
   _onSyncData = async () => {
-    var url = Constants.DEFAULT_SYNC_URI + '?user_id=' + this.state.user_id;
+    var { screen, year, user_info } = this.props;
+    var url = Constants.DEFAULT_SYNC_URI + '?user_id=' + user_info[0].id;
+    console.log(url);
     this.props.onUpdateSyncStatus(Constants.SYNC_WAITING);
     await fetch(url, {
         method: 'GET',
@@ -82,10 +84,39 @@ class MenuBottom extends Component<Props> {
     .then((responseJson) => {
       if(responseJson.code === 200) {
         var json = JSON.parse(responseJson.data);
+        if(json.types.length === 0 && json.locations.length === 0 && json.actions.length === 0) {
+          this.props.onUpdateSyncStatus(Constants.SYNC_SUCCESS);
+          Alert.alert(Constants.ALERT_TITLE_INFO, Constants.NO_DATA_SYNC);
+          return false;
+        }
         Utils.insertToSqlite(json, false);
-        Alert.alert(Constants.ALERT_TITLE_INFO, Constants.SYNC_DATA_SUCCESS);
         this.props.onUpdateSyncStatus(Constants.SYNC_SUCCESS);
-        this.props.loadDataInYear('2018');
+        // Refresh year screen
+        if(screen === Constants.YEAR_SCREEN) {
+          this.props.loadDataInYear(year);
+        }
+
+        // Refresh year screen
+        if(screen === Constants.MONTH_SCREEN) {
+          var { month, budget } = this.props;
+          this.props.loadDataInMonth(year, month, budget);
+        }
+
+        // Refresh day screen
+        if(screen === Constants.DAY_SCREEN) {
+          var { month, day } = this.props;
+          var count = 0;
+          for(var i = 0; i < json.actions.length; i++) {
+            var obj = json.actions[i];
+            var ymd = Utils.formatDateString({ y: year, m: month, d: day });
+            if(ymd === obj.time) {
+              count++;
+            }
+          }
+          this.props.loadDataInDay(year, month, day, count);
+        }
+        
+        Alert.alert(Constants.ALERT_TITLE_INFO, Constants.SYNC_DATA_SUCCESS);
       } else {
         Alert.alert(Constants.ALERT_TITLE_ERR, responseJson.message);
       }
@@ -96,8 +127,17 @@ class MenuBottom extends Component<Props> {
     });
   }
 
-  _onSendData = async () => {
+  _onSendData = () => {
+
+    var { sync_send_data } = this.props;
+
+    if(sync_send_data.send_data_count === 0) {
+      Alert.alert(Constants.ALERT_TITLE_INFO, Constants.NO_DATA_SEND);
+      return false;
+    }
     
+    var data = {types: [], actions: [], locations: []};
+
     var sqlActions = 'SELECT * FROM ' + Constants.ACTIONS_TBL + ' WHERE is_sync = ' + Constants.NOT_SYNC;
     var sqlTypes = 'SELECT * FROM ' + Constants.TYPES_TBL + ' WHERE is_sync = ' + Constants.NOT_SYNC;
     var sqlLocations = 'SELECT * FROM ' + Constants.LOCATIONS_TBL + ' WHERE is_sync = ' + Constants.NOT_SYNC;
@@ -109,81 +149,72 @@ class MenuBottom extends Component<Props> {
         var len = results.rows.length;
         for(var i = 0; i < len; i++) {
           var action = results.rows.item(i);
-          actions.push(action);
+          action.is_sync = Constants.IS_SYNC;
+          data.actions.push(action);
         }
 
-        var data = {types: [], actions: actions};
+        tx.executeSql(sqlLocations, [], (tx, results) => { 
 
-        var url = Constants.DEFAULT_BACKUP_URI;
-        fetch(url, {
-          method: 'POST',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ data: data}),
-        })
-        .then((response) => response.json())
-        .then((responseJson) => {
-            if(responseJson.code === 200) {
-              Alert.alert(Constants.ALERT_TITLE_INFO, Constants.SEND_DATA_SUCCESS);
-              this.props.onUpdateSendDataCount();
-            } else {
-              Alert.alert(Constants.ALERT_TITLE_ERR, responseJson.message);
+          var locations = [];
+          var len = results.rows.length;
+          for(var i = 0; i < len; i++) {
+            var location = results.rows.item(i);
+            location.is_sync = Constants.IS_SYNC;
+            data.locations.push(location);
+          }
+
+          tx.executeSql(sqlTypes, [], (tx, results) => { 
+
+            var types = [];
+            var len = results.rows.length;
+            for(var i = 0; i < len; i++) {
+              var type = results.rows.item(i);
+              type.is_sync = Constants.IS_SYNC;
+              data.types.push(type);
             }
 
-        })
-        .catch((error) =>{
-          Alert.alert(Constants.ALERT_INFO, Constants.SERVER_ERROR);
+            var url = Constants.DEFAULT_BACKUP_URI;
+            fetch(url, {
+              method: 'POST',
+              headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ data: data}),
+            })
+            .then((response) => response.json())
+            .then((responseJson) => {
+                console.log(responseJson);
+                if(responseJson.code === 200) {
+                  this._onUpdateDataSync();
+                  this.props.onUpdateSendDataCount();
+                  Alert.alert(Constants.ALERT_TITLE_INFO, Constants.SEND_DATA_SUCCESS);
+                } else {
+                  Alert.alert(Constants.ALERT_TITLE_ERR, responseJson.message);
+                }
+
+            })
+            .catch((error) =>{
+              Alert.alert(Constants.ALERT_INFO, Constants.SERVER_ERROR);
+            });
+
+          });
         });
       });
+    });
+  }
 
-      // // Types
-      // tx.executeSql(sqlTypes, [], (tx, results) => { 
-      //   var types = [];
-      //   var len = results.rows.length;
-      //   for(var i = 0; i < len; i++) {
-      //     var type = results.rows.item(i);
-      //     types.push(type);
-      //   }
-      // });
-
-      // // Locations
-      // tx.executeSql(sqlLocations, [], (tx, results) => { 
-      //   var locations = [];
-      //   var len = results.rows.length;
-      //   for(var i = 0; i < len; i++) {
-      //     var location = results.rows.item(i);
-      //     locations.push(location);
-      //   }
-      // });
+  _onUpdateDataSync = () => {
+    console.log('_onUpdateDataSync'); 
+    var sql = 'UPDATE ' + Constants.ACTIONS_TBL + ' SET is_sync = ' + Constants.IS_SYNC + ' WHERE is_sync = ' + Constants.NOT_SYNC;
+    var sql1 = 'UPDATE ' + Constants.LOCATIONS_TBL + ' SET is_sync = ' + Constants.IS_SYNC + ' WHERE is_sync = ' + Constants.NOT_SYNC;
+    var sql2 = 'UPDATE ' + Constants.TYPES_TBL + ' SET is_sync = ' + Constants.IS_SYNC + ' WHERE is_sync = ' + Constants.NOT_SYNC;
+    db.transaction((tx) =>   {
+      tx.executeSql(sql, [], (tx, results) => { console.log(results); });
+      tx.executeSql(sql1, [], (tx, results) => { console.log(results); });
+      tx.executeSql(sql2, [], (tx, results) => { console.log(results);  });
     });
 
-    
-
-    //Utils.getDataNotSync();
-    //console.log(data);
-    //console.log(JSON.stringify(data));
-    // var url = Constants.DEFAULT_BACKUP_URI;
-    // fetch(url, {
-    //   method: 'POST',
-    //   headers: {
-    //     Accept: 'application/json',
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify({ data: data}),
-    // })
-    // .then((response) => response.json())
-    // .then((responseJson) => {
-    //     console.log(responseJson);
-    //     // if(responseJson.code === 200) {
-    //     //   this.props.onUpdateSendDataCount();
-    //     // }
-
-    // })
-    // .catch((error) =>{
-    //   Alert.alert(Constants.ALERT_INFO, Constants.SERVER_ERROR);
-    // });
   }
 
   _logout() {
@@ -229,7 +260,8 @@ class MenuBottom extends Component<Props> {
 
 const mapStateToProps = (state) => {
   return {
-    sync_send_data : state.sync_send_data
+    sync_send_data : state.sync_send_data,
+    user_info : state.user_info
   };
 }
 
@@ -244,8 +276,15 @@ const mapDispatchToProps = (dispatch, props) => {
     loadDataInYear : (year) => {
       dispatch(Actions.loadDataInYear(year))
     },
+    loadDataInMonth: (year, month, budget) => {
+        dispatch(Actions.loadDataInMonth(year, month, budget));
+    },
+    loadDataInDay: (year, month, day, count) => {
+        dispatch(Actions.loadDataInDay(year, month, day, count));
+    },
     onUpdateSendDataCount : () => {
       dispatch(Actions.updateSendDataCount(0));
+      dispatch(Actions.updateRowSyncStatusAction());
     }
   };
 }

@@ -8,6 +8,7 @@ import types from './types';
 import locations from './locations';
 import actions from './actions';
 import sync_send_data from './sync_send_data';
+import user_info from './user_info';
 
 const myReducer = combineReducers({
 	login : login,
@@ -17,7 +18,8 @@ const myReducer = combineReducers({
 	types: types,
 	actions: actions,
 	sync_send_data: sync_send_data,
-	locations : locations
+	locations : locations,
+	user_info : user_info
 });
 
 export default myReducer;

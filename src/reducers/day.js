@@ -19,7 +19,7 @@ var myReducer = (state = initialState, action) => {
 			if(action.count > 0) {
 
 				for(var i = 0; i < action.count; i++) {
-					var object = { id: 1, name: '', time: '', location: '', location_id: '', price: '', type_id: '', icon: '', created_at: '' };
+					var object = { id: 1, name: '', time: '', location: '', location_id: '', price: '', type_id: '', icon: '', created_at: '', is_sync: Constants.NOT_SYNC };
 					tempData.push(object);
 				}
 
@@ -51,6 +51,7 @@ var myReducer = (state = initialState, action) => {
 			        			tempData[i].location_id = work.location_id;
 			        			tempData[i].type_id = work.type_id;
 			        			tempData[i].created_at = work.created_at;
+			        			tempData[i].is_sync = work.is_sync;
 			        		}
 			        		
 			        	}
@@ -64,92 +65,47 @@ var myReducer = (state = initialState, action) => {
 
 			return [...state];
 
-		case types.ADD_ACTION:
-		
-			if(state.length > 0 && state[0].id === 999) {
-				state.splice(0, 1);
+		case types.UPDATE_ROW_SYNC_STATUS:
+
+			var len = state.length;
+			for(var i = 0; i < len; i++) {
+				var obj = state[i];
+				obj.is_sync = Constants.IS_SYNC;
 			}
 
-			var obj = {id: 999, name: '', time: '', location: '', location_id: 0, price: '', icon: Constants.DEFAULT_ICON, type_id: 0};
+			return [...state];
 
-			var data = action.formdata;
-			var created_at = data.created_at;
-			var updated_at = Utils.getCurrentDate('YYYY-MM-DD HH:II:SS');
-			
-			var sql = 'INSERT INTO ' + Constants.ACTIONS_TBL + '(name,cost,time,location_id,comment,type_id,is_sync, is_deleted, created_at,updated_at) ';
-				sql +='VALUES("' + data.name + '", "' + data.price + '", "' + data.ymd  + '", ' + data.location + ', "", ' + data.type + ', ' + Constants.NOT_SYNC + ', ' + Constants.NOT_DELETED + ', "' + created_at + '", "' + updated_at + '")';
+		case types.ADD_ACTION:
 
-			db.transaction((tx) => {
-		        tx.executeSql(sql, [], (tx, results) => {
-		        	console.log(results);
-		        	if(results.rowsAffected > 0) {
-
-		        		var len = data.locations.length;
-		        		var location = '';
-		        		for(var i = 0; i < len; i++) {
-		        			if(data.locations[i].id === data.location) {
-		        				location = data.locations[i].name;
-		        				break;
-		        			}
-		        		}
-
-		        		len = data.types.length;
-		        		var icon = '';
-		        		for(var i = 0; i < len; i++) {
-		        			if(data.types[i].id === data.type) {
-		        				icon = data.types[i].icon;
-		        				break;
-		        			}
-		        		}
-
-		        		obj.id = results.insertId;
-		        		obj.name = data.name;
-		        		obj.time = created_at;
-		        		obj.location = location;
-		        		obj.location_id = data.location;
-		        		obj.price = data.price;
-		        		obj.icon = icon;
-		        		obj.type_id = data.type;
-
-		        		Alert.alert(Constants.ALERT_TITLE_INFO, Constants.REGISTER_DATA_SUCCESS);
-		        		
-		        	}
-		        });
-		    });
+		 	var obj = action.formdata;
+		 	obj.is_sync = Constants.NOT_SYNC;
 
 		    state.push(obj);
+
+		    Alert.alert(Constants.ALERT_TITLE_INFO, Constants.REGISTER_DATA_SUCCESS);
 
 		 	return [...state];
 
 		case types.EDIT_ACTION:
 
-			var formdata = action.formdata;
-			var updated_at = Utils.getCurrentDate('YYYY-MM-DD HH:II:SS');
-
-			var sql = 'UPDATE ' + Constants.ACTIONS_TBL + ' ';
-				sql += 'SET name = "' + formdata.name + '", type_id = ' + formdata.type + ', location_id = ' + formdata.location + ', cost = "' + formdata.price + '", is_sync = ' + Constants.NOT_SYNC + ', updated_at = "' + updated_at + '" ';
-				sql += ' WHERE id = ' + formdata.id;
-
-			db.transaction((tx) => {
-		        tx.executeSql(sql, [], (tx, results) => { console.log(results) });
-		    });
+		 	var formdata = action.formdata;
 
 		    var currentAction = state[formdata.index];
 
-		    var len = formdata.types_locations.locations.length;
+		    var len = formdata.locations.length;
     		var location = '';
     		for(var i = 0; i < len; i++) {
-    			if(formdata.types_locations.locations[i].id === formdata.location) {
-    				location = formdata.types_locations.locations[i].name;
+    			if(formdata.locations[i].id === formdata.location) {
+    				location = formdata.locations[i].name;
     				break;
     			}
     		}
 
-    		len = formdata.types_locations.types.length;
+    		len = formdata.types.length;
     		var icon = '';
     		for(var i = 0; i < len; i++) {
-    			if(formdata.types_locations.types[i].id === formdata.type) {
-    				icon = formdata.types_locations.types[i].icon;
+    			if(formdata.types[i].value === formdata.type) {
+    				icon = formdata.types[i].icon;
     				break;
     			}
     		}
@@ -158,24 +114,27 @@ var myReducer = (state = initialState, action) => {
 		    currentAction.price = formdata.price;
 		    currentAction.location = location;
 		    currentAction.icon = icon;
+		    currentAction.is_sync = Constants.NOT_SYNC;
+
+		    Alert.alert(Constants.ALERT_TITLE_INFO, Constants.UPDATE_DATA_SUCCESS); 
 
 			return [...state];
 
 		case types.DEL_ACTION:
-			var currentAction = state[action.index];
+			// var currentAction = state[action.index];
 
-			var sql = 'DELETE FROM ' + Constants.ACTIONS_TBL + ' WHERE id = ' + currentAction.id;
+			// var sql = 'DELETE FROM ' + Constants.ACTIONS_TBL + ' WHERE id = ' + currentAction.id;
 
-			if(currentAction.is_sync === Constants.IS_SYNC) {
+			// if(currentAction.is_sync === Constants.IS_SYNC) {
 
-				sql = 'UPDATE ' + Constants.ACTIONS_TBL + ' SET is_deleted = ' + Constants.IS_DELETED  + ' WHERE id = ' + currentAction.id;
-			}
+			// 	sql = 'UPDATE ' + Constants.ACTIONS_TBL + ' SET is_deleted = ' + Constants.IS_DELETED  + ' WHERE id = ' + currentAction.id;
+			// }
 			
-			console.log(sql);
+			// console.log(sql);
 
-			db.transaction((tx) => {
-		        tx.executeSql(sql, [], (tx, results) => { console.log(results) });
-		    });
+			// db.transaction((tx) => {
+		 //        tx.executeSql(sql, [], (tx, results) => { console.log(results) });
+		 //    });
 
 			state.splice(action.index, 1);
 

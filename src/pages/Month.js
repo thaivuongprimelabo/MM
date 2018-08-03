@@ -21,6 +21,10 @@ import ListItem from '../components/ListItem';
 import Loading from '../components/Loading';
 import MenuBottom from '../components/MenuBottom';
 
+import AddModal from '../components/AddModal';
+import AddLocation from '../components/AddLocation';
+import AddType from '../components/AddType';
+
 
 import * as Constants from '../constants/Constants';
 import * as Actions from '../actions/index';
@@ -82,7 +86,7 @@ class Month extends Component<Props> {
   }
 
   componentWillReceiveProps(nextProps) {
-    var { dataInMonth } = nextProps;
+    var { dataInMonth, sync_send_data } = nextProps;
     if(dataInMonth.length) {
       this.interval = setTimeout(() => {
         this.setState({
@@ -90,6 +94,24 @@ class Month extends Component<Props> {
         })
       }, Constants.DEFAULT_TIMEOUT);
     }
+
+    if(sync_send_data.sync_status === Constants.SYNC_SUCCESS ) {
+      this.setState({
+        dataInMonth : dataInMonth
+      })
+    }
+  }
+
+  _openAddModal = () => {
+    this.refs.addModal.getWrappedInstance().showAddModal();
+  }
+
+  _openAddTypeModal = () => {
+    this.refs.addType.getWrappedInstance().showAddTypeModal();
+  }
+
+  _openAddLocationModal = () => {
+    this.refs.addLocation.getWrappedInstance().showAddLocationModal();
   }
 
   _openMenuBottom = () => {
@@ -119,9 +141,14 @@ class Month extends Component<Props> {
 
   render() {
     var { dataInMonth, year, month } = this.state;
+    var { sync_send_data } = this.props;
     
     var render = <Loading />;
-    var menuBottom = <MenuBottom ref={'showMenuBotton'} navigation={this.props.navigation} />
+    var modal = <AddModal ref={'addModal'} parentFlatList={this} ymd={ '' } index= { 999 } screen= { Constants.MONTH_SCREEN } openTypeModal={ this._openAddTypeModal } openLocationModal={ this._openAddLocationModal }  />
+    var typeModal = <AddType ref={'addType'} parentFlatList={this} ymd={ '' } index= { 999 } />
+    var locationModal = <AddLocation ref={'addLocation'} parentFlatList={this} ymd={ '' } index= { 999 } />
+
+    var menuBottom = <MenuBottom ref={'showMenuBotton'} navigation={this.props.navigation} openAddModal={ this._openAddModal } screen={ Constants.MONTH_SCREEN } year= { this.state.year} month= { this.state.month } budget={ this.state.budget } openTypeModal={ this._openAddTypeModal } openLocationModal={ this._openAddLocationModal } />
 
     if(dataInMonth.length) {
 
@@ -133,9 +160,16 @@ class Month extends Component<Props> {
             renderItem={ this._renderItem } />;
     }
 
+    if(sync_send_data.sync_status === Constants.SYNC_WAITING) {
+      render = <Loading sync={Constants.SYNC_WAITING} />;
+    }
+
     return (
       <View style={styles.container}>
         { render }
+        { modal }
+        { typeModal }
+        { locationModal }
         { menuBottom }
       </View>
     );
@@ -144,8 +178,7 @@ class Month extends Component<Props> {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    marginTop:7
+    flex: 1
   },
   list: {
   },
@@ -164,7 +197,8 @@ const styles = StyleSheet.create({
 const mapStateToProps = (state) => {
     return {
       dataInMonth : state.dataInMonth,
-      types : state.types
+      types : state.types,
+      sync_send_data : state.sync_send_data
     }
 };
 

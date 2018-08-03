@@ -26,6 +26,7 @@ import MenuBottom from '../components/MenuBottom';
 import AddModal from '../components/AddModal';
 import AddLocation from '../components/AddLocation';
 import AddType from '../components/AddType';
+import BudgetModal from '../components/BudgetModal';
 
 import * as Constants from '../constants/Constants';
 import * as Actions from '../actions/index';
@@ -55,11 +56,9 @@ class Year extends Component<Props> {
 
   componentDidMount() {
 
-    var { navigation  } = this.props;
+    var { navigation, datetime  } = this.props;
 
     this.props.navigation.setParams({ openMenuBottom: this._openMenuBottom });
-
-    
 
     this.props.loadDataInYear(this.state.year);
   }
@@ -127,7 +126,7 @@ class Year extends Component<Props> {
   }
 
   onMoneyIconClick = () => {
-
+    this.refs.budgetModal.getWrappedInstance().showBudgetModal();
   }
 
   _renderItem = ({item}) => (
@@ -144,15 +143,15 @@ class Year extends Component<Props> {
     var type_cnt = navigation.getParam('type_cnt');
     var location_cnt = navigation.getParam('location_cnt');
 
-    var modal = <AddModal ref={'addModal'} parentFlatList={this} ymd={ '' } index= { 999 } screen= { Constants.YEAR_SCREEN } location_cnt={ location_cnt } type_cnt={ type_cnt } />
+    var modal = <AddModal ref={'addModal'} parentFlatList={this} ymd={ '' } index= { 999 } screen= { Constants.YEAR_SCREEN } openTypeModal={ this._openAddTypeModal } openLocationModal={ this._openAddLocationModal } />
     var typeModal = <AddType ref={'addType'} parentFlatList={this} ymd={ '' } index= { 999 } screen= { Constants.YEAR_SCREEN } />
     var locationModal = <AddLocation ref={'addLocation'} parentFlatList={this} ymd={ '' } index= { 999 } screen= { Constants.YEAR_SCREEN } />
-
+    var budgetModal = <BudgetModal ref={'budgetModal'}  parentFlatList={this}  />
     var user_id = navigation.getParam('user_id');
     
 
     var render = <Loading />;
-    var menuBottom = <MenuBottom ref={'showMenuBotton'} navigation={this.props.navigation} user_id={ user_id } openAddModal={ this._openAddModal } openTypeModal={ this._openAddTypeModal } openLocationModal={ this._openAddLocationModal } />
+    var menuBottom = <MenuBottom ref={'showMenuBotton'} navigation={this.props.navigation} screen={ Constants.YEAR_SCREEN } year= { this.state.year} openAddModal={ this._openAddModal } openTypeModal={ this._openAddTypeModal } openLocationModal={ this._openAddLocationModal } />
 
     if(dataInYear.length) {
 
@@ -174,6 +173,7 @@ class Year extends Component<Props> {
         { modal }
         { typeModal }
         { locationModal }
+        { budgetModal }
         { menuBottom }
       </View>
     );
