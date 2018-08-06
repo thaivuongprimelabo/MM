@@ -67,6 +67,8 @@ export const DEFAULT_TIMEOUT = 1000;
 export const DEFAULT_ICON = 'https://facebook.github.io/react-native/docs/assets/favicon.png';
 export const DEFAULT_LATLONG = '10.780028, 106.699040';
 export const DEFAULT_FORMAT_DATETIME = 'YYYY-MM-DD HH:II:SS';
+export const PREFIX_CLIENT_ID = 'C';
+export const PREFIX_SERVER_ID = 'S';
 
 export const IS_SYNC = 1;
 export const NOT_SYNC = 0;
@@ -86,9 +88,12 @@ export const MONTH_SCREEN = 'MonthScreen';
 export const YEAR_SCREEN = 'YearScreen';
 export const WELCOME_SCREEN = 'WelcomScreen';
 
-export const SYNC_WAITING = 0;
+export const SYNC_WAITING = 3;
 export const SYNC_SUCCESS = 1;
 export const SYNC_FAIL = 2;
+
+export const LOADING_WAITING = 0;
+export const LOADING_SUCCESS = 1;
 
 export const MONDAY = 'Thứ hai';
 export const TUESDAY = 'Thứ ba';

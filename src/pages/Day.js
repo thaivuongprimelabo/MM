@@ -79,34 +79,19 @@ class Day extends Component<Props> {
     var year = navigation.getParam('year');
     var month = navigation.getParam('month');
     var day = navigation.getParam('day');
-    var count = navigation.getParam('count');
     var ymd = Utils.formatDateString({ y: year, m: month, d: day, format: 'YYYYMMDD' });
+
     this.setState({
       year : year,
       month : month,
       day: day,
-      count: count,
       ymd: ymd,
       index: 999
     })
-    this.props.loadDataInDay(year, month, day, count);
+    this.props.loadDataInDay(year, month, day);
   }
 
   componentWillReceiveProps(nextProps) {
-    var { dataInDay, sync_send_data } = nextProps;
-    if(dataInDay.length) {
-        this.interval = setTimeout(() => {
-          this.setState({
-            dataInDay : dataInDay
-          });
-        }, Constants.DEFAULT_TIMEOUT);
-    }
-
-    if(sync_send_data.sync_status === Constants.SYNC_SUCCESS ) {
-      this.setState({
-        dataInDay : dataInDay
-      })
-    }
   }
 
   _openMenuBottom = () => {
@@ -147,30 +132,32 @@ class Day extends Component<Props> {
   );
 
   render() {
-    var { dataInDay, year, month, day, ymd, count, index } = this.state;
-    var { sync_send_data } = this.props;
-    var render = <Loading />;
+    var { year, month, day, ymd, index } = this.state;
+    var { sync_send_data, dataInDay, loading } = this.props;
+    var render;
     var modal = <AddModal ref={'addModal'} parentFlatList={this} ymd={ ymd } index={ index }  screen={ Constants.DAY_SCREEN } openTypeModal={ this._openAddTypeModal } openLocationModal={ this._openAddLocationModal }   />
     var typeModal = <AddType ref={'addType'} parentFlatList={this} ymd={ '' } index= { 999 } screen= { Constants.YEAR_SCREEN } />
     var locationModal = <AddLocation ref={'addLocation'} parentFlatList={this} ymd={ '' } index= { 999 } screen= { Constants.YEAR_SCREEN } />
     var menuBottom = <MenuBottom ref={'showMenuBotton'} screen={'DayScreen'} navigation={this.props.navigation} screen={ Constants.DAY_SCREEN } year= { this.state.year} month= { this.state.month } day={ this.state.day }  openAddModal={ this._openAddModal } openTypeModal={ this._openAddTypeModal } openLocationModal={ this._openAddLocationModal } />
 
-    // if(!count) {
-    //   render = <NoDataFound />;
-    // }
+    if(loading.status === Constants.LOADING_WAITING) {
 
-    if(dataInDay.length) {
-      if(dataInDay[0].id !== 999) {
+      render = <Loading />;
+
+    } else {
+
+      if(dataInDay.length) {
         render = <FlatList
             contentContainerStyle={styles.list}
             data={dataInDay}
             extraData={this.state}
             keyExtractor={(item, index) => index.toString()}
             renderItem={ this._renderItem } />;
+        
       } else {
         render = <NoDataFound />;
       }
-      
+
     }
 
     if(sync_send_data.sync_status === Constants.SYNC_WAITING) {
@@ -213,14 +200,18 @@ const mapStateToProps = (state) => {
       dataInDay : state.dataInDay,
       types: state.types,
       locations: state.locations,
-      sync_send_data : state.sync_send_data
+      sync_send_data : state.sync_send_data,
+      loading : state.loading
     }
 };
 
 const mapDispatchToProps = (dispatch, props) => {
     return {
-      loadDataInDay: (year, month, day, count) => {
-        dispatch(Actions.loadDataInDay(year, month, day, count));
+      loadDataInDay: (year, month, day) => {
+        dispatch(Actions.loadDataInDay(year, month, day));
+      },
+      onUpdateLoadingStatus: (status) => {
+        dispatch(Actions.updateLoadingStatus(status));
       }
     };
 }

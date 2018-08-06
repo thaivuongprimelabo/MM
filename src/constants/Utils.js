@@ -296,6 +296,7 @@ const Utils = {
     var actionInsertSQL = '';
     var actions = json.actions;
     var lenActions = json.actions.length;
+
     if(lenActions > 0) {
       actionInsertSQL = 'INSERT INTO ' + Constants.ACTIONS_TBL + ' VALUES ';
       var value = '';

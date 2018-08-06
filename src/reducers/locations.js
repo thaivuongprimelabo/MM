@@ -5,25 +5,14 @@ import { Alert } from 'react-native';
 
 var initialState = [];
 
-var SQLite = require('react-native-sqlite-storage')
-var db = SQLite.openDatabase({name: 'test.db', createFromLocation: '~sqliteexample.db'}, this.errorCB, this.successCB);
-
-var sql = 'SELECT id, name FROM ' + Constants.LOCATIONS_TBL + ' ORDER BY created_at DESC ';
-
-db.transaction((tx) => {
-    tx.executeSql(sql, [], (tx, results) => {
-    	var len = results.rows.length;
-    	if(len > 0) {
-    		for(var i = 0; i < len; i++) {
-    			var item = results.rows.item(i);
-    			initialState.push(item);
-    		}
-    	}
-    });
-});
-
 var myReducer = (state = initialState, action) => {
 	switch(action.type) {
+
+        case types.ADD_LOCATIONS:
+
+            state = action.list;
+
+            return [...state];
 
 		case types.ADD_LOCATION:
 

@@ -22,9 +22,11 @@ import Day from './src/pages/Day';
 import Test from './src/pages/Test';
 
 // Store
-import { createStore } from 'redux';
+import { createStore, applyMiddleware } from 'redux';
 import myReducer from './src/reducers/index';
 import { Provider } from 'react-redux';
+
+import thunk from 'redux-thunk';
 
 const RootStack = createStackNavigator(
   {
@@ -40,7 +42,7 @@ const RootStack = createStackNavigator(
   }
 );
 
-const store = createStore(myReducer);
+const store = createStore(myReducer, applyMiddleware(thunk));
 
 type Props = {};
 export default class App extends Component<Props> {

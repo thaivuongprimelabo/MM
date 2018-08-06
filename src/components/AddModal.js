@@ -63,7 +63,8 @@ class AddModal extends Component<Props> {
   }
 
   componentDidMount() {
-
+    this.props.onLoadDataType();
+    this.props.onLoadDataLocation();
   }
 
   componentWillReceiveProps(nextProps) {
@@ -72,7 +73,6 @@ class AddModal extends Component<Props> {
 
   _addAction = () => {
     var formdata = this.state;
-    console.log(formdata);
     var error = '';
     if(formdata['name'] === '') {
       error += Utils.replactParamError(Constants.ERR_REQUIRED,[Constants.TXT_NAME]) + "\n";
@@ -113,10 +113,10 @@ class AddModal extends Component<Props> {
       var { index } = this.props;
 
       if(index === 999) {
-        this._add(formdata)
+        this.props.onAddAction(formdata);
       } else {
         formdata['index'] = index;
-        this._update(formdata);
+        this.props.onEditAction(formdata);
       }
 
       this._resetForm();
@@ -125,104 +125,6 @@ class AddModal extends Component<Props> {
     } else {
       Alert.alert(Constants.ALERT_TITLE_INFO, error);
     }
-  }
-
-
-  _add(data) {
-    var screenName = data.screen;
-    var created_at = data.created_at;
-    var updated_at = Utils.getCurrentDate('YYYY-MM-DD HH:II:SS');
-    
-    var sql = 'INSERT INTO ' + Constants.ACTIONS_TBL + '(name,cost,time,location_id,comment,type_id,is_sync, is_deleted, created_at,updated_at) ';
-        sql +='VALUES("' + data.name + '", "' + data.price + '", "' + data.ymd  + '", ' + data.location + ', "", ' + data.type + ', ' + Constants.NOT_SYNC + ', ' + Constants.NOT_DELETED + ', "' + created_at + '", "' + updated_at + '")';
-
-    db.transaction((tx) => {
-        tx.executeSql(sql, [], (tx, results) => {
-          console.log(data);
-          if(results.rowsAffected > 0) {
-
-            var obj = {id: 999, name: '', time: '', location: '', location_id: 0, price: '', icon: Constants.DEFAULT_ICON, type_id: 0};
-
-            var len = data.locations.length;
-            var location = '';
-            for(var i = 0; i < len; i++) {
-              if(data.locations[i].id === data.location) {
-                location = data.locations[i].name;
-                break;
-              }
-            }
-
-            len = data.types.length;
-            var icon = '';
-            for(var i = 0; i < len; i++) {
-              if(data.types[i].value === data.type) {
-                icon = data.types[i].icon;
-                break;
-              }
-            }
-
-            obj.id = results.insertId;
-            obj.name = data.name;
-            obj.time = created_at;
-            obj.location = location;
-            obj.location_id = data.location;
-            obj.price = data.price;
-            obj.icon = icon;
-            obj.type_id = data.type;
-
-            this.props.onAddAction(obj, screenName);
-
-            var sql = 'SELECT SUM(count) as count FROM ( ';
-                sql += ' SELECT COUNT(id) as count FROM ' + Constants.ACTIONS_TBL + ' WHERE is_sync = ' + Constants.NOT_SYNC + ' UNION ALL ';
-                sql += ' SELECT COUNT(id) as count FROM ' + Constants.LOCATIONS_TBL + ' WHERE is_sync = ' + Constants.NOT_SYNC + ' UNION ALL ';
-                sql += ' SELECT COUNT(value) as count FROM ' + Constants.TYPES_TBL + ' WHERE is_sync = ' + Constants.NOT_SYNC + ' )';
-
-            db.transaction((tx) => {
-              tx.executeSql(sql, [], (tx, results) => {
-                var len = results.rows.length;
-                if(len > 0) {
-                  var send_data_count = results.rows.item(0).count;
-                  this.props.onUpdateSendDataCount(send_data_count);
-                }
-              });
-            });
-            
-          }
-        });
-    });
-  }
-
-  _update(formdata) {
-    var formdata = formdata;
-
-    var screenName = formdata.screen;
-    var updated_at = Utils.getCurrentDate('YYYY-MM-DD HH:II:SS');
-
-    var sql = 'UPDATE ' + Constants.ACTIONS_TBL + ' ';
-        sql += ' SET name = "' + formdata.name + '", type_id = ' + formdata.type + ', location_id = ' + formdata.location + ', cost = "' + formdata.price + '", is_sync = ' + Constants.NOT_SYNC + ', created_at = "' + formdata.created_at + '", updated_at = "' + updated_at + '" ';
-        sql += ' WHERE id = ' + formdata.id;
-
-    db.transaction((tx) => {
-        tx.executeSql(sql, [], (tx, results) => {
-          this.props.onEditAction(formdata, screenName);
-
-          var sql = 'SELECT SUM(count) as count FROM ( ';
-              sql += ' SELECT COUNT(id) as count FROM ' + Constants.ACTIONS_TBL + ' WHERE is_sync = ' + Constants.NOT_SYNC + ' UNION ALL ';
-              sql += ' SELECT COUNT(id) as count FROM ' + Constants.LOCATIONS_TBL + ' WHERE is_sync = ' + Constants.NOT_SYNC + ' UNION ALL ';
-              sql += ' SELECT COUNT(value) as count FROM ' + Constants.TYPES_TBL + ' WHERE is_sync = ' + Constants.NOT_SYNC + ' )';
-
-          db.transaction((tx) => {
-            tx.executeSql(sql, [], (tx, results) => {
-              var len = results.rows.length;
-              if(len > 0) {
-                var send_data_count = results.rows.item(0).count;
-                this.props.onUpdateSendDataCount(send_data_count);
-              }
-            });
-          });
-
-        });
-    });
   }
 
   _resetForm = () => {
@@ -262,7 +164,7 @@ class AddModal extends Component<Props> {
 
   render() {
 
-    var { types_locations, index, locations, types } = this.props;
+    var { index, locations, types } = this.props;
 
     var button_txt = Constants.TXT_BUTTON_UPDATE;
     if(index === 999 || index === 998) {
@@ -296,7 +198,7 @@ class AddModal extends Component<Props> {
                   this.setState({
                     id: action.id,
                     name: action.name,
-                    price: action.price,
+                    price: action.cost,
                     type: action.type_id,
                     location: action.location_id,
                     y: dayString.y,
@@ -442,32 +344,17 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
-    onAddAction: (formdata, screenName) => {
+    onAddAction: (formdata) => {
       dispatch(Actions.addAction(formdata));
-      if(screenName === Constants.YEAR_SCREEN) {
-        dispatch(Actions.loadDataInYear(formdata['y']));
-      }
-      if(screenName === Constants.MONTH_SCREEN) {
-        dispatch(Actions.loadDataInMonth(formdata['y'], formdata['m'], Constants.DEFAULT_BUDGET));
-      }
     },
-    onEditAction: (formdata, screenName) => {
+    onEditAction: (formdata) => {
       dispatch(Actions.editAction(formdata));
-      if(screenName === Constants.YEAR_SCREEN) {
-        dispatch(Actions.loadDataInYear(formdata['y']));
-      }
-      if(screenName === Constants.MONTH_SCREEN) {
-        dispatch(Actions.loadDataInMonth(formdata['y'], formdata['m'], Constants.DEFAULT_BUDGET));
-      }
     },
-    onLoadDataLocation: (cnt) => {
-      dispatch(Actions.loadDataLocation(cnt));
+    onLoadDataLocation: () => {
+      dispatch(Actions.loadDataLocation());
     },
-    onLoadDataType: (cnt) => {
-      dispatch(Actions.loadDataType(cnt));
-    },
-    onUpdateSendDataCount: (count) => {
-      dispatch(Actions.updateSendDataCount(count));
+    onLoadDataType: () => {
+      dispatch(Actions.loadDataType());
     }
   }
 }

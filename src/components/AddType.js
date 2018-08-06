@@ -57,19 +57,7 @@ class AddType extends Component<Props> {
     if(error === '') {
       var formdata = this.state;
 
-      var created_at = updated_at = Utils.getCurrentDate();
-      var id = Utils.generateId();
-      var sql = 'INSERT INTO ' + Constants.TYPES_TBL + '(value, name, color, icon, is_sync, `order`, created_at, updated_at) VALUES ';
-      sql += '(' + id  +',"' + formdata.name + '", "", "' + formdata.icon + '", "' + Constants.NOT_SYNC + '",90,"' + created_at + '", "' + updated_at + '")';
-        
-      db.transaction((tx) => {
-          tx.executeSql(sql, [], (tx, results) => {
-              if(results.rowsAffected > 0) {
-                  this.props.onAddType(formdata);
-                  Alert.alert(Constants.ALERT_TITLE_INFO, Constants.REGISTER_DATA_SUCCESS);
-              }
-          });
-      });
+      this.props.onAddType(formdata);
 
       this._resetForm();
 

@@ -64,20 +64,7 @@ class Year extends Component<Props> {
   }
 
   componentWillReceiveProps(nextProps) {
-    var { dataInYear, sync_send_data } = nextProps;
-    if(dataInYear.length) {
-      this.interval = setTimeout(() => {
-        this.setState({
-          dataInYear : dataInYear
-        })
-      }, Constants.DEFAULT_TIMEOUT);
-    }
 
-    if(sync_send_data.sync_status === Constants.SYNC_SUCCESS ) {
-      this.setState({
-        dataInYear : dataInYear
-      })
-    }
   }
 
   static navigationOptions = ({ navigation }) => {
@@ -137,8 +124,7 @@ class Year extends Component<Props> {
 
   render() {
     
-    var { dataInYear } = this.state;
-    var { navigation, sync_send_data } = this.props;
+    var { navigation, sync_send_data, dataInYear, loading } = this.props;
 
     var type_cnt = navigation.getParam('type_cnt');
     var location_cnt = navigation.getParam('location_cnt');
@@ -150,21 +136,34 @@ class Year extends Component<Props> {
     var user_id = navigation.getParam('user_id');
     
 
-    var render = <Loading />;
+    var render;
     var menuBottom = <MenuBottom ref={'showMenuBotton'} navigation={this.props.navigation} screen={ Constants.YEAR_SCREEN } year= { this.state.year} openAddModal={ this._openAddModal } openTypeModal={ this._openAddTypeModal } openLocationModal={ this._openAddLocationModal } />
 
-    if(dataInYear.length) {
 
-      render = <FlatList
-                contentContainerStyle={styles.list}
-                data={ dataInYear }
-                extraData={this.state}
-                keyExtractor={(item, index) => index.toString()}
-                renderItem={ this._renderItem } />;
-    }
+    switch(loading.status) {
+      
+      case Constants.LOADING_WAITING:
 
-    if(sync_send_data.sync_status === Constants.SYNC_WAITING) {
-      render = <Loading sync={Constants.SYNC_WAITING} />;
+        render = <Loading />;
+
+        break;
+
+      case Constants.SYNC_WAITING:
+
+        render = <Loading sync={Constants.SYNC_WAITING} />;
+
+        break;
+
+      default:
+
+        render = <FlatList
+                  contentContainerStyle={styles.list}
+                  data={ dataInYear }
+                  extraData={this.state}
+                  keyExtractor={(item, index) => index.toString()}
+                  renderItem={ this._renderItem } />;
+
+        break;
     }
 
     return (
@@ -200,7 +199,8 @@ const styles = StyleSheet.create({
 const mapStateToProps = (state) => {
     return {
       dataInYear : state.dataInYear,
-      sync_send_data : state.sync_send_data
+      sync_send_data : state.sync_send_data,
+      loading : state.loading
     };
 };
 

@@ -39,35 +39,9 @@ class ActionItem extends Component<Props> {
 
     var action = dataInDay[index];
 
-    var sql = 'DELETE FROM ' + Constants.ACTIONS_TBL + ' WHERE id = ' + action.id;
+    action['index'] = index;
 
-    if(action.is_sync === Constants.IS_SYNC) {
-
-      sql = 'UPDATE ' + Constants.ACTIONS_TBL + ' SET is_deleted = ' + Constants.IS_DELETED  + ', is_sync = ' + Constants.NOT_SYNC + ' WHERE id = ' + action.id;
-    }
-
-    db.transaction((tx) => {
-      tx.executeSql(sql, [], (tx, results) => {
-
-        this.props.onDelAction(index);
-
-        var sql = 'SELECT SUM(count) as count FROM ( ';
-            sql += ' SELECT COUNT(id) as count FROM ' + Constants.ACTIONS_TBL + ' WHERE is_sync = ' + Constants.NOT_SYNC + ' UNION ALL ';
-            sql += ' SELECT COUNT(id) as count FROM ' + Constants.LOCATIONS_TBL + ' WHERE is_sync = ' + Constants.NOT_SYNC + ' UNION ALL ';
-            sql += ' SELECT COUNT(value) as count FROM ' + Constants.TYPES_TBL + ' WHERE is_sync = ' + Constants.NOT_SYNC + ' )';
-
-        db.transaction((tx) => {
-          tx.executeSql(sql, [], (tx, results) => {
-            var len = results.rows.length;
-            if(len > 0) {
-              var send_data_count = results.rows.item(0).count;
-              this.props.onUpdateSendDataCount(send_data_count);
-            }
-          });
-        });
-        
-      });
-    });
+    this.props.onDelAction(action);
   }
 
 	render() {
@@ -82,9 +56,9 @@ class ActionItem extends Component<Props> {
 
     var moneyInfo = <View style={ styles.itemGroupCenter }>
                   <Text style={styles.itemCode}><Image source={ require('../img/action.png') } style={{width: 40, height: 40}} /> { action.name } </Text>
-                  <Text style={styles.itemCode}><Image source={ require('../img/clock.png') } style={{width: 40, height: 40}} /> { action.time } </Text>
+                  <Text style={styles.itemCode}><Image source={ require('../img/clock.png') } style={{width: 40, height: 40}} /> { action.created_at } </Text>
                   <Text style={styles.itemCode}><Image source={ require('../img/location.png') } style={{width: 40, height: 40}} /> { action.location }</Text>
-                  <Text style={styles.itemCode}><Image source={ require('../img/price.png') } style={{width: 40, height: 40}} /> { Utils.formatCurrency(action.price, '.', '.') }</Text>
+                  <Text style={styles.itemCode}><Image source={ require('../img/price.png') } style={{width: 40, height: 40}} /> { Utils.formatCurrency(action.cost, '.', '.') }</Text>
                 </View>;
 
     var status_sync;
@@ -204,8 +178,8 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
-    onDelAction: (index) => {
-      dispatch(Actions.delAction(index));
+    onDelAction: (action) => {
+      dispatch(Actions.delAction(action));
     },
     onUpdateSendDataCount: (count) => {
       dispatch(Actions.updateSendDataCount(count));

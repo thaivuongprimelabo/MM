@@ -17,6 +17,8 @@ import * as Actions from '../actions/index';
 import * as Constants from '../constants/Constants';
 import Utils from '../constants/Utils';
 
+import axios from 'axios';
+
 var SQLite = require('react-native-sqlite-storage')
 var db = SQLite.openDatabase({name: 'test.db', createFromLocation: '~sqliteexample.db'}, this.errorCB, this.successCB);
 
@@ -26,8 +28,7 @@ class Form extends Component<Props> {
     super(props);
     this.state = {
       loginid : Constants.DEFAULT_USER,
-      password: Constants.DEFAULT_PASSWORD,
-      showLoading: false
+      password: Constants.DEFAULT_PASSWORD
     }
   }
 
@@ -49,11 +50,11 @@ class Form extends Component<Props> {
     }
 
     if(error === '') {
-      var data = {
+      var loginInfo = {
         loginid: this.state.loginid,
         password: this.state.password
       }
-      this._doLogin(data);
+      this.props.onSubmitLogin(loginInfo);
 
     } else {
       Alert.alert(Constants.ALERT_TITLE_INFO, error);
@@ -61,65 +62,11 @@ class Form extends Component<Props> {
     
   }
 
-  _saveToSqlite = (responseJson) => {
-    var json = JSON.parse(responseJson);
-
-    Utils.insertToSqlite(json, true);
-
-    // Insert sqlite
-    db.transaction((tx) =>   {
-      tx.executeSql('SELECT * FROM ' + Constants.USERS_TBL, [], (tx, results) => { 
-        var len = results.rows.length;
-        if(len === 0) {
-          this.props.navigation.navigate('LoginScreen');
-        } else {
-
-          var params = { user_id: results.rows.item(0).id };
-
-          this.props.navigation.navigate(Constants.YEAR_SCREEN, params);
-
-        }
-      });
-    });
-  }
-
-  _doLogin = async (loginInfo) => {
-    this.setState({ showLoading: true });
-    var checkLogin = false;
-    var url = Constants.DEFAULT_AUTH_URI;
-    await fetch(url, {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(loginInfo),
-    })
-    .then((response) => response.json())
-    .then((responseJson) => {
-
-        if(responseJson.code === 200) {
-          this._saveToSqlite(responseJson.data);
-          checkLogin = true;
-        }
-    })
-    .catch((error) =>{
-        alert(error);
-    });
-
-    if(checkLogin) {
-      //this.props.navigation.navigate(Constants.YEAR_SCREEN);
-    } else {
-      Alert.alert(Constants.ALERT_TITLE_ERR, Constants.LOGIN_FAILED);
-    }
-    this.setState({ showLoading: false });
-  }
-
 	render() {
 
-    var { showLoading } = this.state;
+    var { loading } = this.props;
     var loginLoading;
-    if(showLoading) {
+    if(loading.status === Constants.LOADING_WAITING) {
       loginLoading = <ActivityIndicator size="small" color="#ffffff" />;
     }
 
@@ -185,18 +132,20 @@ const styles = StyleSheet.create({
   },
 });
 
-// const mapStateToProps = (state) => {
-//   return {
-//     response: state.login
-//   };
-// }
+const mapStateToProps = (state) => {
+  return {
+    loading : state.loading
+  };
+}
 
-// const mapDispatchToProps = (dispatch, props) => {
-//   return {
+const mapDispatchToProps = (dispatch, props) => {
+  return {
+    onSubmitLogin : (loginInfo) => {
+      dispatch(Actions.submitLogin(loginInfo, props.navigation));
+    }
+  };
+}
 
-//   };
-// }
+export default connect(mapStateToProps, mapDispatchToProps)(Form);
 
-// export default connect(mapStateToProps, mapDispatchToProps)(Form);
-
-export default Form;
+// export default Form;

@@ -86,20 +86,6 @@ class Month extends Component<Props> {
   }
 
   componentWillReceiveProps(nextProps) {
-    var { dataInMonth, sync_send_data } = nextProps;
-    if(dataInMonth.length) {
-      this.interval = setTimeout(() => {
-        this.setState({
-          dataInMonth : dataInMonth
-        })
-      }, Constants.DEFAULT_TIMEOUT);
-    }
-
-    if(sync_send_data.sync_status === Constants.SYNC_SUCCESS ) {
-      this.setState({
-        dataInMonth : dataInMonth
-      })
-    }
   }
 
   _openAddModal = () => {
@@ -140,8 +126,8 @@ class Month extends Component<Props> {
   );
 
   render() {
-    var { dataInMonth, year, month } = this.state;
-    var { sync_send_data } = this.props;
+    var { year, month } = this.state;
+    var { dataInMonth, loading, sync_send_data } = this.props;
     
     var render = <Loading />;
     var modal = <AddModal ref={'addModal'} parentFlatList={this} ymd={ '' } index= { 999 } screen= { Constants.MONTH_SCREEN } openTypeModal={ this._openAddTypeModal } openLocationModal={ this._openAddLocationModal }  />
@@ -150,8 +136,11 @@ class Month extends Component<Props> {
 
     var menuBottom = <MenuBottom ref={'showMenuBotton'} navigation={this.props.navigation} openAddModal={ this._openAddModal } screen={ Constants.MONTH_SCREEN } year= { this.state.year} month= { this.state.month } budget={ this.state.budget } openTypeModal={ this._openAddTypeModal } openLocationModal={ this._openAddLocationModal } />
 
-    if(dataInMonth.length) {
+    if(loading.status === Constants.LOADING_WAITING) {
 
+      render = <Loading />;
+
+    } else {
       render = <FlatList
             contentContainerStyle={styles.list}
             data={dataInMonth}
@@ -198,7 +187,8 @@ const mapStateToProps = (state) => {
     return {
       dataInMonth : state.dataInMonth,
       types : state.types,
-      sync_send_data : state.sync_send_data
+      sync_send_data : state.sync_send_data,
+      loading : state.loading
     }
 };
 

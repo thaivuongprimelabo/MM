@@ -42,6 +42,7 @@ var myReducer = (state = initialState, action) => {
 
 		case types.UPDATE_SEND_DATA_COUNT:
 
+			console.log(action)
 			
 			state.send_data_count = action.count;
 

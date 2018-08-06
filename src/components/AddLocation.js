@@ -59,20 +59,7 @@ class AddLocation extends Component<Props> {
     if(error === '') {
 
       var formdata = this.state;
-      var id = Utils.generateId();
-      var created_at = updated_at = Utils.getCurrentDate();
-      var sql = 'INSERT INTO ' + Constants.LOCATIONS_TBL + '(id, name, latlong, is_sync, address, desc_image, created_at, updated_at) VALUES ';
-      sql += '(' + id + ', "' + formdata.name  +'", "' + formdata.latlong + '", ' + Constants.NOT_SYNC + ', "' + formdata.address + '","","' + created_at + '", "' + updated_at + '")';
-      db.transaction((tx) => {
-          tx.executeSql(sql, [], (tx, results) => {
-            if(results.rowsAffected > 0) {
-                var obj = {id: id, name: formdata.name};
-                this.props.onAddLocation(obj);
-                Alert.alert(Constants.ALERT_TITLE_INFO, Constants.REGISTER_DATA_SUCCESS);
-            }
-          });
-      });
-
+      this.props.onAddLocation(formdata);
       this._resetForm();
       this.refs.myLocationModal.close();
 
