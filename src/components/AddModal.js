@@ -9,7 +9,8 @@ import {
   TextInput,
   TouchableOpacity,
   Picker,
-  Alert
+  Alert,
+  Keyboard
 } from 'react-native';
 
 import { compose } from 'redux';
@@ -22,9 +23,6 @@ import Utils from '../constants/Utils';
 import Modal from 'react-native-modalbox';
 
 var screen = Dimensions.get('window');
-
-var SQLite = require('react-native-sqlite-storage')
-var db = SQLite.openDatabase({name: 'test.db', createFromLocation: '~sqliteexample.db'}, this.errorCB, this.successCB);
 
 class AddModal extends Component<Props> {
 
@@ -48,7 +46,9 @@ class AddModal extends Component<Props> {
       name: '',
       price: '',
       type: '0',
+      type_name : '',
       location: '0',
+      location_name: '',
       ymd: '',
       y: y,
       m: m,
@@ -68,7 +68,20 @@ class AddModal extends Component<Props> {
   }
 
   componentWillReceiveProps(nextProps) {
+    var { select_type, select_location } = nextProps;
+    if(select_type !== undefined) {
+      this.setState({
+        type_name : select_type.name,
+        type : select_type.value
+      });
+    }
 
+    if(select_location !== undefined) {
+      this.setState({
+        location_name : select_location.name,
+        location : select_location.id
+      });
+    }
   }
 
   _addAction = () => {
@@ -142,7 +155,9 @@ class AddModal extends Component<Props> {
         name: '',
         price: '',
         type: '0',
+        type_name : '',
         location: '0',
+        location_name: '',
         ymd: '',
         y: y,
         m: m,
@@ -159,6 +174,16 @@ class AddModal extends Component<Props> {
 
   _addType = () => {
     this.props.openTypeModal();
+  }
+
+  _selectType = () => {
+    Keyboard.dismiss();
+    this.props.openSelectTypeModal();
+  }
+
+  _selectLocation = () => {
+    Keyboard.dismiss();
+    this.props.openSelectLocationModal();
   }
 
 
@@ -182,7 +207,7 @@ class AddModal extends Component<Props> {
 
     return (
       <Modal ref={'myModal'}
-             style={{ justifyContent: 'center', borderRadius:5, shadowRadius: 10, width: screen.width - 30, height: 450  }} 
+             style={{ justifyContent: 'center', borderRadius:5, shadowRadius: 10, width: screen.width - 30, height: 450, paddingLeft: 30  }} 
              position='center'
              backdrop={true}
              onOpened={() => {
@@ -232,93 +257,102 @@ class AddModal extends Component<Props> {
       >
         <Text style={{ fontSize:16, fontWeight: 'bold', textAlign: 'center' }}>{ Constants.TXT_TITLE_ACTION_MODAL }</Text>
         <TextInput 
-            style={{ height:40, marginLeft:30, marginRight: 30,marginTop: 20, marginBottom: 10,  }}
+            style={[{ height:40, marginRight: 30,marginTop: 20, marginBottom: 10 }, Constants.STYLES.borderInput]}
+            underlineColorAndroid={'transparent'}
             onChangeText={(text) => this.setState({ name: text })}
             placeholder={ Constants.TXT_NAME }
             value={ this.state.name } />
 
-        <View style={{ flexDirection : 'row', justifyContent: 'center', alignItems: 'center',  marginBottom: 20 }}>
-          <Picker
-            selectedValue={this.state.type}
-            style={{ width:220, height:40}}
-            onValueChange={(itemValue, itemIndex) => this.setState({type: itemValue})}>
-            <Picker.Item label={ Constants.TXT_SELECT_TYPE } value="0" />
-            { typeItem }
-          </Picker>
+        <View style={{ flexDirection : 'row', justifyContent: 'flex-start', alignItems: 'center',  marginBottom: 20 }}>
+          <TextInput 
+            style={[{ width:140, height:40, marginRight: 10}, Constants.STYLES.borderInput]}
+            underlineColorAndroid={'transparent'}
+            onChangeText={(text) => this.setState({ type_name: text })}
+            placeholder={ Constants.TXT_SELECT_TYPE }
+            value={ this.state.type_name } />
+          <TouchableOpacity onPress={ this._selectType } style={{ width:60, height:40, borderRadius: 6, backgroundColor: '#1D2F3C',  justifyContent: 'center', alignItems: 'center', marginRight:5 }}>
+            <Text style={{ color:'#f0f0f0' }}>Chọn</Text>
+          </TouchableOpacity>
           <TouchableOpacity onPress={ this._addType } style={{ width:60, height:40, borderRadius: 6, backgroundColor: '#1D2F3C',  justifyContent: 'center', alignItems: 'center' }}>
             <Text style={{ color:'#f0f0f0' }}>Thêm</Text>
           </TouchableOpacity>
         </View>
 
-        <View style={{ flexDirection : 'row', paddingLeft: 10, justifyContent: 'center', alignItems: 'center',  marginBottom: 20 }}>
+        <View style={{ flexDirection : 'row', justifyContent: 'flex-start', alignItems: 'center',  marginBottom: 20 }}>
           
           <TextInput 
-              style={{ flex:0.1, height:40, flexDirection:'column' }}
+              style={[{ flex:0.1, height:40, flexDirection:'column' }, Constants.STYLES.borderInput]}
+              underlineColorAndroid={'transparent'}
               onChangeText={(text) => this.setState({ d: text })}
               placeholder={ 'dd' }
               value={ this.state.d } />
 
-          <View style={{ flex:0.05, flexDirection:'column', justifyContent: 'center', alignItems: 'center' }}>
+          <View style={{ flex:0.05, flexDirection:'column', justifyContent: 'center', alignItems: 'center', marginTop:10 }}>
             <Text>/</Text>
           </View>
 
           <TextInput 
-              style={{ flex:0.1, height:40, flexDirection:'column' }}
+              style={[{ flex:0.1, height:40, flexDirection:'column' }, Constants.STYLES.borderInput]}
+              underlineColorAndroid={'transparent'}
               onChangeText={(text) => this.setState({ m: text })}
               placeholder={ 'mm' }
               value={ this.state.m } />
 
-          <View style={{ flex:0.05, flexDirection:'column', justifyContent: 'center', alignItems: 'center' }}>
+          <View style={{ flex:0.05, flexDirection:'column', justifyContent: 'center', alignItems: 'center', marginTop:10 }}>
             <Text>/</Text>
           </View>
 
           <TextInput 
-              style={{ flex:0.15, height:40, flexDirection:'column' }}
+              style={[{ flex:0.15, height:40, flexDirection:'column' }, Constants.STYLES.borderInput]}
               onChangeText={(text) => this.setState({ y: text })}
               placeholder={ 'yyyy' }
               value={ this.state.y } />
 
           <TextInput 
-              style={{ flex:0.1, height:40, flexDirection:'column' }}
+              style={[{ flex:0.1, height:40, flexDirection:'column', marginLeft: 3 }, Constants.STYLES.borderInput]}
               onChangeText={(text) => this.setState({ h: text })}
               placeholder={ 'hh' }
               value={ this.state.h } />
 
-          <View style={{ flex:0.05, flexDirection:'column', justifyContent: 'center', alignItems: 'center' }}>
+          <View style={{ flex:0.05, flexDirection:'column', justifyContent: 'center', alignItems: 'center', marginTop:10 }}>
             <Text>:</Text>
           </View>
 
           <TextInput 
-              style={{ flex:0.1, height:40, flexDirection:'column' }}
+              style={[{ flex:0.1, height:40, flexDirection:'column' }, Constants.STYLES.borderInput]}
               onChangeText={(text) => this.setState({ i: text })}
               placeholder={ 'ii' }
               value={ this.state.i } />
 
-          <View style={{ flex:0.05, flexDirection:'column', justifyContent: 'center', alignItems: 'center' }}>
+          <View style={{ flex:0.05, flexDirection:'column', justifyContent: 'center', alignItems: 'center', marginTop:10 }}>
             <Text>:</Text>
           </View>
 
           <TextInput 
-              style={{ flex:0.1, height:40, flexDirection:'column' }}
+              style={[{ flex:0.1, height:40, flexDirection:'column' }, Constants.STYLES.borderInput]}
               onChangeText={(text) => this.setState({ s: text })}
               placeholder={ 'ss' }
               value={ this.state.s } />
         </View>
 
         <TextInput 
-            style={{ height:40, marginLeft:30, marginRight: 30, marginBottom: 20,   }}
+            style={[{ height:40, marginRight: 30, marginBottom: 20 }, Constants.STYLES.borderInput]}
             onChangeText={(text) => this.setState({ price: text })}
             placeholder={ Constants.TXT_PRICE }
             value={ this.state.price } />
 
-      <View style={{ flexDirection : 'row', justifyContent: 'center', alignItems: 'center',  marginBottom: 20 }}>
-        <Picker
-          selectedValue={this.state.location}
-          style={{ width:220, height:40}}
-          onValueChange={(itemValue, itemIndex) => this.setState({location: itemValue})}>
-          <Picker.Item label={ Constants.TXT_SELECT_LOCATION } value="0" />
-          { locationItem }
-        </Picker>
+      <View style={{ flexDirection : 'row', justifyContent: 'flex-start', alignItems: 'center',  marginBottom: 20 }}>
+
+        <TextInput 
+            style={[{ width:140, height:40, marginRight: 10}, Constants.STYLES.borderInput]}
+            underlineColorAndroid={'transparent'}
+            onChangeText={(text) => this.setState({ location_name: text })}
+            placeholder={ Constants.TXT_SELECT_LOCATION }
+            value={ this.state.location_name } />
+
+        <TouchableOpacity onPress={ this._selectLocation } style={{ width:60, height:40, borderRadius: 6, backgroundColor: '#1D2F3C',  justifyContent: 'center', alignItems: 'center', marginRight:5 }}>
+            <Text style={{ color:'#f0f0f0' }}>Chọn</Text>
+          </TouchableOpacity>
 
         <TouchableOpacity onPress={ this._addLocation } style={{ width:60, height:40, borderRadius: 6, backgroundColor: '#1D2F3C',  justifyContent: 'center', alignItems: 'center' }}>
           <Text style={{ color:'#f0f0f0' }}>Thêm</Text>
@@ -333,12 +367,22 @@ class AddModal extends Component<Props> {
   }
 }
 
+const styles = StyleSheet.create({
+  borderInput : {
+     paddingBottom:-5,
+     borderBottomWidth:1, 
+     borderBottomColor: '#888888'
+  }
+});
+
 const mapStateToProps = (state) => {
   return {
     types: state.types,
     dataInDay: state.dataInDay,
     sync_send_data: state.sync_send_data,
-    locations : state.locations
+    locations : state.locations,
+    select_type : state.select_type,
+    select_location : state.select_location
   };
 }
 

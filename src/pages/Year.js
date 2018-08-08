@@ -27,6 +27,8 @@ import AddModal from '../components/AddModal';
 import AddLocation from '../components/AddLocation';
 import AddType from '../components/AddType';
 import BudgetModal from '../components/BudgetModal';
+import SelectTypeModal from '../components/SelectTypeModal';
+import SelectLocationModal from '../components/SelectLocationModal';
 
 import * as Constants from '../constants/Constants';
 import * as Actions from '../actions/index';
@@ -51,10 +53,12 @@ class Year extends Component<Props> {
   }
 
   componentWillMount() {
-    
+    console.log('componentWillMount')
   }
 
   componentDidMount() {
+
+    console.log('componentDidMount')
 
     var { navigation, datetime  } = this.props;
 
@@ -64,7 +68,6 @@ class Year extends Component<Props> {
   }
 
   componentWillReceiveProps(nextProps) {
-
   }
 
   static navigationOptions = ({ navigation }) => {
@@ -89,7 +92,7 @@ class Year extends Component<Props> {
   };
 
   onMonthItemClick = (month, budget) => {
-    this.props.navigation.navigate(Constants.MONTH_SCREEN, { month: month, year: this.state.year, budget: budget, onBackFromMonth: this._onBackFromMonth });
+    this.props.navigation.push(Constants.MONTH_SCREEN, { month: month, year: this.state.year, budget: budget, onBackFromMonth: this._onBackFromMonth });
   }
 
   _openAddModal = () => {
@@ -106,6 +109,14 @@ class Year extends Component<Props> {
 
   _openMenuBottom = () => {
     this.refs.showMenuBotton.getWrappedInstance().showActionSheet();
+  }
+
+  _openSelectTypeModal = () => {
+    this.refs.openSelectType.getWrappedInstance().showSelectTypeModal();
+  }
+
+  _openSelectLocationModal = () => {
+    this.refs.openSelectLocation.getWrappedInstance().showSelectLocationModal();
   }
 
   _onBackFromMonth = () => {
@@ -129,10 +140,13 @@ class Year extends Component<Props> {
     var type_cnt = navigation.getParam('type_cnt');
     var location_cnt = navigation.getParam('location_cnt');
 
-    var modal = <AddModal ref={'addModal'} parentFlatList={this} ymd={ '' } index= { 999 } screen= { Constants.YEAR_SCREEN } openTypeModal={ this._openAddTypeModal } openLocationModal={ this._openAddLocationModal } />
+    var modal = <AddModal ref={'addModal'} parentFlatList={this} ymd={ '' } index= { 999 } screen= { Constants.YEAR_SCREEN } openTypeModal={ this._openAddTypeModal } openLocationModal={ this._openAddLocationModal } openSelectTypeModal={ this._openSelectTypeModal } openSelectLocationModal={ this._openSelectLocationModal } />
     var typeModal = <AddType ref={'addType'} parentFlatList={this} ymd={ '' } index= { 999 } screen= { Constants.YEAR_SCREEN } />
     var locationModal = <AddLocation ref={'addLocation'} parentFlatList={this} ymd={ '' } index= { 999 } screen= { Constants.YEAR_SCREEN } />
     var budgetModal = <BudgetModal ref={'budgetModal'}  parentFlatList={this}  />
+    var selectTypeModal = <SelectTypeModal ref={'openSelectType'} parentFlatList={this} />;
+    var selectLocationModal = <SelectLocationModal ref={'openSelectLocation'} parentFlatList={this} />;
+
     var user_id = navigation.getParam('user_id');
     
 
@@ -173,6 +187,8 @@ class Year extends Component<Props> {
         { typeModal }
         { locationModal }
         { budgetModal }
+        { selectTypeModal }
+        { selectLocationModal }
         { menuBottom }
       </View>
     );

@@ -40,7 +40,7 @@ export const submitLogin = (loginInfo, navigation) => {
 	    });
 	    
 	    if(checkLogin) {
-	      navigation.navigate(Constants.YEAR_SCREEN);
+	      navigation.push(Constants.YEAR_SCREEN);
 	    } else {
 	      Alert.alert(Constants.ALERT_TITLE_ERR, Constants.LOGIN_FAILED);
 	    }
@@ -49,7 +49,7 @@ export const submitLogin = (loginInfo, navigation) => {
 
 export const loadDataInYear = (year) => {
 	return (dispatch) => {
-
+		console.log('loadDataInYear')
 		dispatch(updateLoadingStatus(Constants.LOADING_WAITING));
 
 		var list = [
@@ -281,7 +281,6 @@ export const loadDataType = () => {
 		        	var list = [];
 		            for(var i = 0; i < len; i++) {
 		                var item = results.rows.item(i);
-		                console.log(item)
 		                list.push(item);
 		            }
 		            dispatch(addTypes(list));
@@ -406,6 +405,7 @@ export const addType = (formdata) => {
 	    db.transaction((tx) => {
 	        tx.executeSql(sql, [], (tx, results) => {
 	            if(results.rowsAffected > 0) {
+	            	formdata['value'] = id;
 	            	dispatch(addTypeToList(formdata));
 	                Alert.alert(Constants.ALERT_TITLE_INFO, Constants.REGISTER_DATA_SUCCESS);
 	            }
@@ -662,5 +662,33 @@ export const syncData = (user_id, screen) => {
 
 	        dispatch(updateLoadingStatus(Constants.SYNC_SUCCESS));
 	    });
+	}
+}
+
+export const selectType = (item) => {
+	return {
+		type: types.SELECT_TYPE,
+		item : item
+	}
+}
+
+export const selectLocation = (item) => {
+	return {
+		type: types.SELECT_LOCATION,
+		item : item
+	}
+}
+
+export const searchType = (keyword) => {
+	return {
+		type : types.SEARCH_TYPE,
+		keyword : keyword
+	}
+}
+
+export const searchLocation = (keyword) => {
+	return {
+		type : types.SEARCH_LOCATION,
+		keyword : keyword
 	}
 }

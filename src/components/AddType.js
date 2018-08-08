@@ -98,13 +98,15 @@ class AddType extends Component<Props> {
       >
         <Text style={{ fontSize:16, fontWeight: 'bold', textAlign: 'center' }}>{ Constants.TXT_ADD_TYPE }</Text>
         <TextInput 
-            style={{ height:40, marginLeft:30, marginRight: 30,marginTop: 20, marginBottom: 10,  }}
+            style={[{ height:40, marginLeft:30, marginRight: 30,marginTop: 20, marginBottom: 10,  }, Constants.STYLES.borderInput]}
+            underlineColorAndroid={'transparent'}
             onChangeText={(text) => this.setState({ name: text })}
             placeholder={ Constants.TXT_TYPE_NAME }
             value={ this.state.name } />
 
         <TextInput 
-            style={{ height:40, marginLeft:30, marginRight: 30,marginTop: 20, marginBottom: 10,  }}
+            style={[{ height:40, marginLeft:30, marginRight: 30,marginTop: 20, marginBottom: 10,  }, Constants.STYLES.borderInput]}
+            underlineColorAndroid={'transparent'}
             onChangeText={(text) => this.setState({ icon: text })}
             placeholder={ Constants.TXT_ICON }
             value={ this.state.icon } />

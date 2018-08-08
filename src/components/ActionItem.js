@@ -19,9 +19,6 @@ import Swipeout from 'react-native-swipeout';
 import TrashButton from './TrashButton';
 import EditButton from './EditButton';
 
-var SQLite = require('react-native-sqlite-storage')
-var db = SQLite.openDatabase({name: 'test.db', createFromLocation: '~sqliteexample.db'}, this.errorCB, this.successCB);
-
 class ActionItem extends Component<Props> {
 
   onMoneyIconClick = () => {

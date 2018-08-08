@@ -19,9 +19,6 @@ import Utils from '../constants/Utils';
 
 import axios from 'axios';
 
-var SQLite = require('react-native-sqlite-storage')
-var db = SQLite.openDatabase({name: 'test.db', createFromLocation: '~sqliteexample.db'}, this.errorCB, this.successCB);
-
 class Form extends Component<Props> {
 
   constructor(props) {

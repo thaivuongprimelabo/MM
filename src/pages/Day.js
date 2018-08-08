@@ -26,6 +26,8 @@ import AddModal from '../components/AddModal';
 import AddLocation from '../components/AddLocation';
 import AddType from '../components/AddType';
 import MenuBottom from '../components/MenuBottom';
+import SelectTypeModal from '../components/SelectTypeModal';
+import SelectLocationModal from '../components/SelectLocationModal';
 
 import * as Constants from '../constants/Constants';
 import * as Actions from '../actions/index';
@@ -115,6 +117,14 @@ class Day extends Component<Props> {
     this.refs.addLocation.getWrappedInstance().showAddLocationModal();
   }
 
+  _openSelectTypeModal = () => {
+    this.refs.openSelectType.getWrappedInstance().showSelectTypeModal();
+  }
+
+  _openSelectLocationModal = () => {
+    this.refs.openSelectLocation.getWrappedInstance().showSelectLocationModal();
+  }
+
   onActionClick = () => {
     this._openAddModal();
   }
@@ -135,9 +145,11 @@ class Day extends Component<Props> {
     var { year, month, day, ymd, index } = this.state;
     var { sync_send_data, dataInDay, loading } = this.props;
     var render;
-    var modal = <AddModal ref={'addModal'} parentFlatList={this} ymd={ ymd } index={ index }  screen={ Constants.DAY_SCREEN } openTypeModal={ this._openAddTypeModal } openLocationModal={ this._openAddLocationModal }   />
+    var modal = <AddModal ref={'addModal'} parentFlatList={this} ymd={ ymd } index={ index }  screen={ Constants.DAY_SCREEN } openTypeModal={ this._openAddTypeModal } openLocationModal={ this._openAddLocationModal } openSelectTypeModal={ this._openSelectTypeModal } openSelectLocationModal={ this._openSelectLocationModal }  />
     var typeModal = <AddType ref={'addType'} parentFlatList={this} ymd={ '' } index= { 999 } screen= { Constants.YEAR_SCREEN } />
     var locationModal = <AddLocation ref={'addLocation'} parentFlatList={this} ymd={ '' } index= { 999 } screen= { Constants.YEAR_SCREEN } />
+    var selectTypeModal = <SelectTypeModal ref={'openSelectType'} parentFlatList={this} />;
+    var selectLocationModal = <SelectLocationModal ref={'openSelectLocation'} parentFlatList={this} />;
     var menuBottom = <MenuBottom ref={'showMenuBotton'} screen={'DayScreen'} navigation={this.props.navigation} screen={ Constants.DAY_SCREEN } year= { this.state.year} month= { this.state.month } day={ this.state.day }  openAddModal={ this._openAddModal } openTypeModal={ this._openAddTypeModal } openLocationModal={ this._openAddLocationModal } />
 
     if(loading.status === Constants.LOADING_WAITING) {
@@ -171,6 +183,8 @@ class Day extends Component<Props> {
           { modal }
           { typeModal }
           { locationModal }
+          { selectTypeModal }
+          { selectLocationModal }
           { menuBottom }
         </View>
     );

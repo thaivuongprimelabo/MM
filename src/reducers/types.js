@@ -22,6 +22,16 @@ var myReducer = (state = initialState, action) => {
 
             return [...state];
 
+        case types.SEARCH_TYPE:
+
+            if(action.keyword) {
+                state = state.filter((type) => {
+                  return type.name.indexOf(action.keyword) !== -1;
+                });
+            }
+
+            return [...state];
+            
         default:
 
             return state;

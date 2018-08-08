@@ -23,9 +23,6 @@ import Modal from 'react-native-modalbox';
 
 var screen = Dimensions.get('window');
 
-var SQLite = require('react-native-sqlite-storage')
-var db = SQLite.openDatabase({name: 'test.db', createFromLocation: '~sqliteexample.db'}, this.errorCB, this.successCB);
-
 class AddLocation extends Component<Props> {
 
   showAddLocationModal = () => {
@@ -101,19 +98,22 @@ class AddLocation extends Component<Props> {
       >
         <Text style={{ fontSize:16, fontWeight: 'bold', textAlign: 'center' }}>{ Constants.TXT_ADD_LOCATION }</Text>
         <TextInput 
-            style={{ height:40, marginLeft:30, marginRight: 30,marginTop: 20, marginBottom: 10,  }}
+            style={[{ height:40, marginLeft:30, marginRight: 30,marginTop: 20, marginBottom: 10,  }, Constants.STYLES.borderInput]}
+            underlineColorAndroid={'transparent'}
             onChangeText={(text) => this.setState({ name: text })}
             placeholder={ Constants.TXT_LOCATION }
             value={ this.state.name } />
 
         <TextInput 
-            style={{ height:40, marginLeft:30, marginRight: 30,marginTop: 20, marginBottom: 10,  }}
+            style={[{ height:40, marginLeft:30, marginRight: 30,marginTop: 20, marginBottom: 10,  }, Constants.STYLES.borderInput]}
+            underlineColorAndroid={'transparent'}
             onChangeText={(text) => this.setState({ address: text })}
             placeholder={ Constants.TXT_ADDRESS }
             value={ this.state.address } />
 
         <TextInput 
-            style={{ height:40, marginLeft:30, marginRight: 30,marginTop: 20, marginBottom: 10,  }}
+            style={[{ height:40, marginLeft:30, marginRight: 30,marginTop: 20, marginBottom: 10,  }, Constants.STYLES.borderInput]}
+            underlineColorAndroid={'transparent'}
             onChangeText={(text) => this.setState({ latlong: text })}
             placeholder={ Constants.TXT_LATLONG }
             value={ this.state.latlong } />

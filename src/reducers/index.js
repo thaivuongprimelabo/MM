@@ -10,6 +10,8 @@ import actions from './actions';
 import sync_send_data from './sync_send_data';
 import user_info from './user_info';
 import loading from './loading';
+import select_type from './select_type';
+import select_location from './select_location';
 
 const myReducer = combineReducers({
 	login : login,
@@ -21,7 +23,9 @@ const myReducer = combineReducers({
 	sync_send_data: sync_send_data,
 	locations : locations,
 	user_info : user_info,
-	loading : loading
+	loading : loading,
+	select_type : select_type,
+	select_location : select_location
 });
 
 export default myReducer;

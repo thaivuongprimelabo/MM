@@ -1,3 +1,8 @@
+import {
+  StyleSheet,
+} from 'react-native';
+
+
 export const HEADER_BG_COLOR = '#1D2F3C';
 export const HEADER_TINI_COLOR = '#ffffff';
 export const YEAR = 'Năm';
@@ -54,6 +59,7 @@ export const TXT_CLOSE = 'Đóng';
 export const TXT_ADD_ACTION = 'Đăng ký hoạt động';
 export const TXT_ADD_TYPE = 'Đăng ký loại hoạt động';
 export const TXT_ADD_LOCATION = 'Đăng ký địa điểm';
+export const TXT_KEYWORD = 'Từ khóa tìm kiếm';
 
 export const DEFAULT_USER= 'vuongluu';
 export const DEFAULT_PASSWORD= '!23456Abc';
@@ -102,3 +108,11 @@ export const THURSDAY = 'Thứ năm';
 export const FRIDAY = 'Thứ sáu';
 export const SATURDAY = 'Thứ bảy';
 export const SUNDAY = 'Chủ Nhật';
+
+export const STYLES = StyleSheet.create({
+	borderInput : {
+     paddingBottom:-5,
+     borderBottomWidth:1, 
+     borderBottomColor: '#888888'
+  	}
+});
